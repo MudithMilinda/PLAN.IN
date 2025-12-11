@@ -27,7 +27,7 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
   const links = [
     { label: "Dashboard", href: "/dashboard", icon: <IconDashboard className="h-5 w-5 text-white" /> },
     { label: "Generate Plan", href: "/generate-plan", icon: <IconFilePlus className="h-5 w-5 text-white" /> },
-    { label: "My Events", href: "/my-events", icon: <IconCalendarEvent className="h-5 w-5 text-white" /> },
+    { label: "My Events", href: "/my-event", icon: <IconCalendarEvent className="h-5 w-5 text-white" /> },
     { label: "Calendar", href: "/calendar", icon: <IconCalendar className="h-5 w-5 text-white" /> },
   ];
 

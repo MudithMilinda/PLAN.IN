@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import LoadingPage from "@/components/layout/loading"; 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,7 +23,16 @@ export default function RootLayout({
       afterSignUpUrl="/dashboard"
     >
       <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body
+          className={`${inter.className} text-white min-h-screen`}
+          style={{
+            backgroundColor: '#050020',
+            backgroundAttachment: 'fixed', // keeps background fixed
+          }}
+        >
+          <LoadingPage /> {/* Optional, keeps loading effect */}
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );

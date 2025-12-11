@@ -7,19 +7,32 @@ import FeaturesGrid from '@/components/Home/features-grid';
 import AboutSection from '@/components/Home/about-section';
 import CTASection from '@/components/Home/cta-section';
 import BrandStrip from "@/components/Home/BrandStrip";
+import InfiniteMovingCardsDemo from "@/components/Home/feedback";
+import LoadingPage from "@/components/layout/loading";
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-white overflow-hidden" style={{background: 'linear-gradient(to bottom, #050020, #050020, #050020)'}}>
-      <Navbar />
-      <HeroSection />
-      <BrandStrip />
-      <FeatureCards />
-      <StatsSection />
-      <FeaturesGrid />
-      <AboutSection />
-      <CTASection />
-      <Footer />
-    </div>
+    <>
+      <LoadingPage />
+      <div
+        className="text-white w-full"
+        style={{
+          background: 'linear-gradient(to bottom, #050020, #050020, #050020)',
+          backgroundAttachment: 'fixed', // keeps background fixed
+          minHeight: '100vh',
+        }}
+      >
+        <Navbar />
+        <HeroSection />
+        <BrandStrip />
+        <FeatureCards />
+        <StatsSection />
+        <FeaturesGrid />
+        <AboutSection />
+        <InfiniteMovingCardsDemo /> 
+        <CTASection />
+        <Footer />
+      </div>
+    </>
   );
 }

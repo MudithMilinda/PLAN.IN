@@ -184,7 +184,9 @@ export default function InteractiveCalendar() {
 
   const handleDateClick = (fullDate: Date | null) => {
     if (fullDate) {
-      setSelectedDate(fullDate);
+      // Create a new date at noon to avoid timezone issues
+      const selectedDateAtNoon = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate(), 12, 0, 0);
+      setSelectedDate(selectedDateAtNoon);
       setShowEventModal(true);
       setOverlapWarning(null);
       setEditingEventId(null);
@@ -429,12 +431,18 @@ export default function InteractiveCalendar() {
             {days.map((day, index) => {
               const dayEvents = getEventsForDate(day.fullDate);
               const isTodayDate = isToday(day.fullDate);
+              const isSelected = selectedDate && 
+                day.fullDate.getDate() === selectedDate.getDate() &&
+                day.fullDate.getMonth() === selectedDate.getMonth() &&
+                day.fullDate.getFullYear() === selectedDate.getFullYear();
 
               return (
                 <div
                   key={index}
                   onClick={() => handleDateClick(day.fullDate)}
-                  className={`border-r border-b border-gray-200 p-2 min-h-32 cursor-pointer hover:bg-gray-50 transition-colors bg-white ${
+                  className={`border-r border-b border-gray-200 p-2 min-h-32 cursor-pointer hover:bg-gray-50 transition-colors ${
+                    isSelected ? 'bg-indigo-50 border-2 border-indigo-400' : 'bg-white'
+                  } ${
                     !day.isCurrentMonth ? 'text-gray-400' : 'text-gray-900'
                   }`}
                 >
