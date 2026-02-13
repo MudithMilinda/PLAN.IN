@@ -28,7 +28,7 @@ type ErrorState = Omit<Record<FormFields, boolean>, "additionalInfo">;
 type TouchedState = Omit<Record<FormFields, boolean>, "additionalInfo">;
 
 export default function EventFormPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
 
   useEffect(() => {
@@ -44,12 +44,12 @@ export default function EventFormPage() {
 
   return (
     <SidebarDemo>
-      <EventFormContent />
+      <EventFormContent userId={user?.id} />
     </SidebarDemo>
   );
 }
 
-function EventFormContent() {
+function EventFormContent({ userId }: { userId?: string }) {
   // 2️⃣ Strong typed form data
   const [formData, setFormData] = useState<FormData>({
     eventName: "",
@@ -79,7 +79,7 @@ function EventFormContent() {
 
   // 4️⃣ Handle input changes
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const field = e.target.name as FormFields;
     const value = e.target.value;
@@ -137,15 +137,72 @@ function EventFormContent() {
   };
 
   // 7️⃣ Submit handler
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (validateForm()) {
-      console.log("Form submitted:", formData);
-      alert("Marketing Plan Generated! ✅");
-      // router.push("/dashboard") or API request here
+  if (!validateForm()) return;
+
+  try {
+    // ✅ CORRECT ENDPOINT - /api/events/create use karanna
+    const res = await fetch("http://localhost:5000/api/events/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clerkUserId: userId,
+        eventName: formData.eventName,
+        eventTheme: formData.eventTheme,
+        targetAudience: formData.targetAudience,
+        location: formData.location,
+        eventDate: formData.eventDate,
+        additionalInfo: formData.additionalInfo,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to save event");
     }
-  };
+
+    const result = await res.json();
+    console.log("Success:", result);
+    
+    alert("Marketing Plan Generated & Saved! ✅");
+
+    // 🔥 RESET FORM HERE
+    setFormData({
+      eventName: "",
+      eventTheme: "",
+      targetAudience: "",
+      location: "",
+      eventDate: "",
+      additionalInfo: "",
+    });
+
+    setErrors({
+      eventName: false,
+      eventTheme: false,
+      targetAudience: false,
+      location: false,
+      eventDate: false,
+    });
+
+    setTouched({
+      eventName: false,
+      eventTheme: false,
+      targetAudience: false,
+      location: false,
+      eventDate: false,
+    });
+
+    // Optional: Redirect to events page
+    // router.push("/events");
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Something went wrong while saving your event ❌");
+  }
+};
 
   return (
     <div
@@ -180,7 +237,7 @@ function EventFormContent() {
             <InputField
               label="Event Name"
               name="eventName"
-              placeholder="Tech Innovation Summit 2025"
+              placeholder="Event name or title"
               value={formData.eventName}
               onChange={handleChange}
               onBlur={() => handleBlur("eventName")}
@@ -189,37 +246,49 @@ function EventFormContent() {
               required
             />
 
-            {/* THEME */}
-            <InputField
-              label="Event Theme"
+            {/* EVENT THEME - DROPDOWN */}
+            <SelectField
+              label="Event Categories"
               name="eventTheme"
-              placeholder="AI and the future of technology"
               value={formData.eventTheme}
               onChange={handleChange}
               onBlur={() => handleBlur("eventTheme")}
               error={errors.eventTheme && touched.eventTheme}
               errorMessage="Event theme is required"
               required
+              options={[
+                "Music Concerts",
+                "Baila Concerts",
+                "Party Music Events",
+                "DJ / Club Events",
+                "Music Festivals",
+                "Classical & Carnatic Music Events",
+              ]}
             />
 
-            {/* TARGET AUDIENCE */}
-            <InputField
+            {/* TARGET AUDIENCE - DROPDOWN */}
+            <SelectField
               label="Target Audience"
               name="targetAudience"
-              placeholder="Tech professionals, startup founders"
               value={formData.targetAudience}
               onChange={handleChange}
               onBlur={() => handleBlur("targetAudience")}
               error={errors.targetAudience && touched.targetAudience}
               errorMessage="Target audience is required"
               required
+              options={[
+                "Youth / Young Adults (15–25)",
+                "Young Professionals (25–35)",
+                "Adults / Families (35–55)",
+                "Tourists / Expat Community",
+              ]}
             />
 
             {/* LOCATION */}
             <InputField
               label="Location"
               name="location"
-              placeholder="Nelum Pokuna"
+              placeholder="Event location"
               value={formData.location}
               onChange={handleChange}
               onBlur={() => handleBlur("location")}
@@ -259,7 +328,8 @@ function EventFormContent() {
             {/* ADDITIONAL INFO */}
             <div>
               <label className="block text-white font-semibold mb-2">
-                Additional Information <span className="text-gray-500 font-normal">(Optional)</span>
+                Additional Information{" "}
+                <span className="text-gray-500 font-normal">(Optional)</span>
               </label>
               <textarea
                 name="additionalInfo"
@@ -331,6 +401,65 @@ function InputField({
             : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
         }`}
       />
+      {error && errorMessage && (
+        <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
+      )}
+    </div>
+  );
+}
+
+/* REUSABLE SELECT COMPONENT */
+interface SelectProps {
+  label: string;
+  name: FormFields;
+  value: string;
+  options: string[];
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onBlur: () => void;
+  error?: boolean;
+  errorMessage?: string;
+  required?: boolean;
+}
+
+function SelectField({
+  label,
+  name,
+  value,
+  options,
+  onChange,
+  onBlur,
+  error = false,
+  errorMessage = "",
+  required = false,
+}: SelectProps) {
+  return (
+    <div>
+      <label className="block text-white font-semibold mb-2">
+        {label} {required && <span className="text-red-400">*</span>}
+      </label>
+
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className={`w-full bg-slate-900/50 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all ${
+          error
+            ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
+            : "border-slate-700/50 focus:ring-2 focus:ring-purple-500/20"
+        }`}
+      >
+        <option value="" disabled>
+          Select {label}
+        </option>
+
+        {options.map((option) => (
+          <option key={option} value={option} className="bg-slate-900">
+            {option}
+          </option>
+        ))}
+      </select>
+
       {error && errorMessage && (
         <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
       )}

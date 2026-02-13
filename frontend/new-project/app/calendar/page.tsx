@@ -1,11 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X, AlertCircle, Clock, MapPin, Users, AlignLeft, Check } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  X,
+  AlertCircle,
+  Clock,
+  MapPin,
+  Users,
+  AlignLeft,
+  Check
+} from 'lucide-react';
 import { SidebarDemo } from '@/components/layout/Sidebar';
+import { useUser } from '@clerk/nextjs';
 
 interface Event {
-  id: number;
+  id: string;
   title: string;
   date: Date;
   startTime: string;
@@ -15,6 +27,15 @@ interface Event {
   participants: string;
   location: string;
   description: string;
+  category: string;
+}
+
+interface BackendEvent {
+  id: string;
+  event_name: string;
+  event_date: string;
+  location: string;
+  event_theme: string;
 }
 
 interface NewEventData {
@@ -26,39 +47,19 @@ interface NewEventData {
   participants: string;
   location: string;
   description: string;
+  category: string;
 }
 
 export default function InteractiveCalendar() {
+  const { user } = useUser();
+  const dayRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
   const [selectedCalendar, setSelectedCalendar] = useState<string>('my-calendar');
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: 1,
-      title: 'Parinamaya Live Concert',
-      date: new Date(2025, 10, 23),
-      startTime: '14:00',
-      endTime: '16:00',
-      allDay: false,
-      calendar: 'my-calendar',
-      participants: '',
-      location: '',
-      description: ''
-    },
-    {
-      id: 2,
-      title: 'Team Meeting',
-      date: new Date(2025, 10, 25),
-      startTime: '10:00',
-      endTime: '11:00',
-      allDay: false,
-      calendar: 'work',
-      participants: '',
-      location: '',
-      description: ''
-    }
-  ]);
+
+  const [events, setEvents] = useState<Event[]>([]);
   const [newEvent, setNewEvent] = useState<NewEventData>({
     title: '',
     startTime: '',
@@ -67,18 +68,15 @@ export default function InteractiveCalendar() {
     calendar: 'my-calendar',
     participants: '',
     location: '',
-    description: ''
+    description: '',
+    category: ''
   });
-  const [editingEventId, setEditingEventId] = useState<number | null>(null);
+
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [overlapWarning, setOverlapWarning] = useState<Event | null>(null);
-  const [activeCalendars, setActiveCalendars] = useState<Record<string, boolean>>({
-    'my-calendar': true,
-    'work': true,
-    'fun': true,
-    'family': true,
-    'important': true,
-    'selected': true
-  });
+
+  const [myEvents, setMyEvents] = useState<BackendEvent[]>([]);
+  const [loadingMyEvents, setLoadingMyEvents] = useState(true);
 
   const calendars = [
     { id: 'my-calendar', name: 'My calendar', color: 'bg-yellow-500', icon: '📅' },
@@ -96,6 +94,53 @@ export default function InteractiveCalendar() {
 
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+  // 🔥 FETCH BACKEND EVENTS
+  useEffect(() => {
+    const fetchMyEvents = async () => {
+      if (!user?.id) {
+        setLoadingMyEvents(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clerkUserId: user.id })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setMyEvents(data.events || []);
+
+          const mappedEvents: Event[] = (data.events || []).map((event: BackendEvent) => ({
+            id: event.id,
+            title: event.event_name,
+            date: new Date(event.event_date),
+            startTime: '09:00',
+            endTime: '10:00',
+            allDay: true,
+            calendar: 'my-calendar',
+            participants: '',
+            location: event.location || '',
+            description: '',
+            category: event.event_theme || ''
+          }));
+
+          setEvents(mappedEvents);
+        } else {
+          console.error('Error fetching events:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoadingMyEvents(false);
+      }
+    };
+
+    fetchMyEvents();
+  }, [user?.id]);
+
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -106,12 +151,12 @@ export default function InteractiveCalendar() {
     if (startingDayOfWeek === -1) startingDayOfWeek = 6;
 
     const days = [];
-    
+
     for (let i = 0; i < startingDayOfWeek; i++) {
       const prevMonthDay = new Date(year, month, -startingDayOfWeek + i + 1);
       days.push({ date: prevMonthDay.getDate(), isCurrentMonth: false, fullDate: prevMonthDay });
     }
-    
+
     for (let i = 1; i <= daysInMonth; i++) {
       days.push({ date: i, isCurrentMonth: true, fullDate: new Date(year, month, i) });
     }
@@ -126,14 +171,13 @@ export default function InteractiveCalendar() {
 
   const getEventsForDate = (fullDate: Date | null) => {
     if (!fullDate) return [];
-    
     return events.filter(event => {
       const eventDate = new Date(event.date);
-      const isActiveCalendar = activeCalendars[event.calendar];
-      return isActiveCalendar &&
-             eventDate.getDate() === fullDate.getDate() &&
-             eventDate.getMonth() === fullDate.getMonth() &&
-             eventDate.getFullYear() === fullDate.getFullYear();
+      return (
+        eventDate.getDate() === fullDate.getDate() &&
+        eventDate.getMonth() === fullDate.getMonth() &&
+        eventDate.getFullYear() === fullDate.getFullYear()
+      );
     });
   };
 
@@ -141,11 +185,11 @@ export default function InteractiveCalendar() {
     if (!selectedDate || !newEventData.startTime || newEventData.allDay) return null;
 
     const dayEvents = getEventsForDate(selectedDate).filter(e => !e.allDay);
-    
+
     const newStart = new Date(selectedDate);
     const [startHours, startMinutes] = newEventData.startTime.split(':');
     newStart.setHours(parseInt(startHours), parseInt(startMinutes));
-    
+
     const newEnd = new Date(selectedDate);
     const [endHours, endMinutes] = newEventData.endTime.split(':');
     newEnd.setHours(parseInt(endHours), parseInt(endMinutes));
@@ -154,7 +198,7 @@ export default function InteractiveCalendar() {
       const eventStart = new Date(event.date);
       const [eStartHours, eStartMinutes] = event.startTime.split(':');
       eventStart.setHours(parseInt(eStartHours), parseInt(eStartMinutes));
-      
+
       const eventEnd = new Date(event.date);
       const [eEndHours, eEndMinutes] = event.endTime.split(':');
       eventEnd.setHours(parseInt(eEndHours), parseInt(eEndMinutes));
@@ -184,8 +228,14 @@ export default function InteractiveCalendar() {
 
   const handleDateClick = (fullDate: Date | null) => {
     if (fullDate) {
-      // Create a new date at noon to avoid timezone issues
-      const selectedDateAtNoon = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate(), 12, 0, 0);
+      const selectedDateAtNoon = new Date(
+        fullDate.getFullYear(),
+        fullDate.getMonth(),
+        fullDate.getDate(),
+        12,
+        0,
+        0
+      );
       setSelectedDate(selectedDateAtNoon);
       setShowEventModal(true);
       setOverlapWarning(null);
@@ -198,7 +248,8 @@ export default function InteractiveCalendar() {
         calendar: selectedCalendar,
         participants: '',
         location: '',
-        description: ''
+        description: '',
+        category: ''
       });
     }
   };
@@ -214,9 +265,8 @@ export default function InteractiveCalendar() {
       }
 
       if (editingEventId) {
-        // Update existing event
-        setEvents(events.map(event => 
-          event.id === editingEventId 
+        setEvents(events.map(event =>
+          event.id === editingEventId
             ? {
                 ...event,
                 title: newEvent.title,
@@ -227,14 +277,14 @@ export default function InteractiveCalendar() {
                 calendar: newEvent.calendar,
                 participants: newEvent.participants,
                 location: newEvent.location,
-                description: newEvent.description
+                description: newEvent.description,
+                category: newEvent.category
               }
             : event
         ));
       } else {
-        // Add new event
         setEvents([...events, {
-          id: Date.now(),
+          id: Date.now().toString(),
           title: newEvent.title,
           date: selectedDate,
           startTime: newEvent.startTime || '00:00',
@@ -243,10 +293,11 @@ export default function InteractiveCalendar() {
           calendar: newEvent.calendar,
           participants: newEvent.participants,
           location: newEvent.location,
-          description: newEvent.description
+          description: newEvent.description,
+          category: newEvent.category
         }]);
       }
-      
+
       setNewEvent({
         title: '',
         startTime: '',
@@ -255,7 +306,8 @@ export default function InteractiveCalendar() {
         calendar: selectedCalendar,
         participants: '',
         location: '',
-        description: ''
+        description: '',
+        category: ''
       });
       setShowEventModal(false);
       setOverlapWarning(null);
@@ -263,7 +315,7 @@ export default function InteractiveCalendar() {
     }
   };
 
-  const handleDeleteEvent = (eventId: number) => {
+  const handleDeleteEvent = (eventId: string) => {
     setEvents(events.filter(e => e.id !== eventId));
     setShowEventModal(false);
     setEditingEventId(null);
@@ -280,25 +332,21 @@ export default function InteractiveCalendar() {
       calendar: event.calendar,
       participants: event.participants || '',
       location: event.location || '',
-      description: event.description || ''
+      description: event.description || '',
+      category: event.category || ''
     });
     setEditingEventId(event.id);
     setShowEventModal(true);
     setOverlapWarning(null);
   };
 
-  const toggleCalendar = (calendarId: string) => {
-    setActiveCalendars({
-      ...activeCalendars,
-      [calendarId]: !activeCalendars[calendarId]
-    });
-  };
-
   const isToday = (fullDate: Date) => {
     const today = new Date();
-    return fullDate.getDate() === today.getDate() &&
-           fullDate.getMonth() === today.getMonth() &&
-           fullDate.getFullYear() === today.getFullYear();
+    return (
+      fullDate.getDate() === today.getDate() &&
+      fullDate.getMonth() === today.getMonth() &&
+      fullDate.getFullYear() === today.getFullYear()
+    );
   };
 
   const days = getDaysInMonth(currentDate);
@@ -362,30 +410,69 @@ export default function InteractiveCalendar() {
           </div>
         </div>
 
-        {/* My Calendars */}
+        {/* My Events */}
         <div className="flex-1 overflow-y-auto">
-          <div className="mb-2 text-xs font-semibold text-indigo-300 flex items-center justify-between">
-            <button className="flex items-center gap-1 hover:text-indigo-100">
-              <ChevronLeft className="w-3 h-3 -rotate-90" />
-              <span>MY CALENDARS</span>
-            </button>
+          <div className="mb-2 text-xs font-semibold text-indigo-300">
+            MY EVENTS 📅
           </div>
-          
-          <div className="space-y-1">
-            {calendars.map(cal => (
-              <div
-                key={cal.id}
-                className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-indigo-800 cursor-pointer"
-                onClick={() => toggleCalendar(cal.id)}
-              >
-                <div className={`w-3 h-3 rounded-sm ${cal.color} flex items-center justify-center`}>
-                  {activeCalendars[cal.id] && <Check className="w-2 h-2 text-white" />}
+
+          {loadingMyEvents ? (
+            <p className="text-indigo-300 text-sm">Loading events...</p>
+          ) : myEvents.length > 0 ? (
+            <div className="space-y-2">
+              {myEvents.map(event => (
+                <div
+                  key={event.id}
+                  onClick={() => {
+                    const eventDate = new Date(event.event_date);
+                    const noonDate = new Date(
+                      eventDate.getFullYear(),
+                      eventDate.getMonth(),
+                      eventDate.getDate(),
+                      12,
+                      0,
+                      0
+                    );
+
+                    setCurrentDate(noonDate);
+                    setSelectedDate(noonDate);
+
+                    setTimeout(() => {
+                      const key = noonDate.toDateString();
+                      const el = dayRefs.current[key];
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }, 100);
+                  }}
+                  className="group flex flex-col gap-1 py-2 px-3 rounded-lg bg-indigo-900/40 hover:bg-indigo-800 cursor-pointer transition"
+                >
+                  <span className="text-sm font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
+                    {event.event_name}
+                  </span>
+                  <span className="text-xs text-indigo-300">
+                    {new Date(event.event_date).toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </span>
+                  {event.location && (
+                    <span className="text-xs text-indigo-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> {event.location}
+                    </span>
+                  )}
+                  {event.event_theme && (
+                    <span className="text-xs text-indigo-400 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> {event.event_theme}
+                    </span>
+                  )}
                 </div>
-                <span className="text-sm flex-1 text-indigo-100">{cal.name}</span>
-                <span className="text-xs">{cal.icon}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-indigo-400 text-sm">No events yet</p>
+          )}
         </div>
       </div>
 
@@ -422,7 +509,7 @@ export default function InteractiveCalendar() {
           <div className="grid grid-cols-7 border-t border-l border-gray-200">
             {/* Day Headers */}
             {daysOfWeek.map((day, index) => (
-              <div key={day} className={`border-r border-b border-gray-200 bg-white p-3 text-center text-sm font-medium ${index === 1 ? 'text-indigo-600' : 'text-gray-700'}`}>
+              <div key={index} className="border-r border-b border-gray-200 p-2 text-sm font-semibold text-gray-700 bg-gray-50 text-center">
                 {day}
               </div>
             ))}
@@ -431,14 +518,17 @@ export default function InteractiveCalendar() {
             {days.map((day, index) => {
               const dayEvents = getEventsForDate(day.fullDate);
               const isTodayDate = isToday(day.fullDate);
-              const isSelected = selectedDate && 
-                day.fullDate.getDate() === selectedDate.getDate() &&
-                day.fullDate.getMonth() === selectedDate.getMonth() &&
-                day.fullDate.getFullYear() === selectedDate.getFullYear();
+              const isSelected =
+                selectedDate &&
+                day.fullDate.toDateString() === selectedDate.toDateString();
 
               return (
                 <div
                   key={index}
+                  ref={(el) => {
+                    const key = day.fullDate.toDateString();
+                    dayRefs.current[key] = el;
+                  }}
                   onClick={() => handleDateClick(day.fullDate)}
                   className={`border-r border-b border-gray-200 p-2 min-h-32 cursor-pointer hover:bg-gray-50 transition-colors ${
                     isSelected ? 'bg-indigo-50 border-2 border-indigo-400' : 'bg-white'
@@ -446,8 +536,12 @@ export default function InteractiveCalendar() {
                     !day.isCurrentMonth ? 'text-gray-400' : 'text-gray-900'
                   }`}
                 >
-                  <div 
-                    className={`text-sm font-medium mb-1 ${isTodayDate ? 'bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto' : ''}`}
+                  <div
+                    className={`text-sm font-medium mb-1 ${
+                      isTodayDate
+                        ? 'bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto'
+                        : ''
+                    }`}
                   >
                     {day.date}
                   </div>
@@ -458,9 +552,20 @@ export default function InteractiveCalendar() {
                         <div
                           key={event.id}
                           onClick={(e) => handleEditEvent(event, e)}
-                          className={`text-xs px-1.5 py-0.5 rounded ${cal?.color} text-white truncate hover:opacity-80 cursor-pointer transition-opacity`}
+                          className={`text-xs px-2 py-1 rounded-md font-medium shadow-sm ${
+                            cal?.color || 'bg-indigo-600'
+                          } text-white truncate hover:brightness-110 cursor-pointer transition`}
+                          title={`${event.title} • ${event.location} • ${event.category}`}
                         >
-                          {event.allDay ? event.title : `${event.startTime} ${event.title}`}
+                          {event.allDay
+                            ? event.title.length > 18
+                              ? event.title.slice(0, 18) + '...'
+                              : event.title
+                            : `${event.startTime} ${
+                                event.title.length > 15
+                                  ? event.title.slice(0, 15) + '...'
+                                  : event.title
+                              }`}
                         </div>
                       );
                     })}
@@ -578,6 +683,18 @@ export default function InteractiveCalendar() {
                   onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                   placeholder="Add location"
+                />
+              </div>
+
+              {/* Category Input */}
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-gray-500" />
+                <input
+                  type="text"
+                  value={newEvent.category}
+                  onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900 placeholder-gray-400"
+                  placeholder="Event category"
                 />
               </div>
 

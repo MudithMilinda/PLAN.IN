@@ -1,3 +1,4 @@
+'use client';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/Home/hero-section';
@@ -9,8 +10,17 @@ import CTASection from '@/components/Home/cta-section';
 import BrandStrip from "@/components/Home/BrandStrip";
 import InfiniteMovingCardsDemo from "@/components/Home/feedback";
 import LoadingPage from "@/components/layout/loading";
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/users')
+      .then(res => res.json())
+      .then(data => setUsers(data));
+  }, []);
+  
   return (
     <>
       <LoadingPage />

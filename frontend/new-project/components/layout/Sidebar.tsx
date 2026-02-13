@@ -4,15 +4,17 @@
 import React, { useState, ReactNode } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/aceternity-sidebar";
 import {
-  IconDashboard,       
-  IconFilePlus,        
-  IconCalendarEvent,   
-  IconCalendar,        
-  IconLogout
+  IconDashboard,
+  IconFilePlus,
+  IconCalendarEvent,
+  IconCalendar,
+  IconLogout,
 } from "@tabler/icons-react";
 import { Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser, SignedIn, SignOutButton, UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const LOGO_TEXT = "PLAN.IN";
 
@@ -23,12 +25,13 @@ interface SidebarDemoProps {
 export function SidebarDemo({ children }: SidebarDemoProps) {
   const { user } = useUser();
   const [open, setOpen] = useState(true);
+  const pathname = usePathname();
 
   const links = [
-    { label: "Dashboard", href: "/dashboard", icon: <IconDashboard className="h-5 w-5 text-white" /> },
-    { label: "Generate Plan", href: "/generate-plan", icon: <IconFilePlus className="h-5 w-5 text-white" /> },
-    { label: "My Events", href: "/my-event", icon: <IconCalendarEvent className="h-5 w-5 text-white" /> },
-    { label: "Calendar", href: "/calendar", icon: <IconCalendar className="h-5 w-5 text-white" /> },
+    { label: "Dashboard", href: "/dashboard", icon: <IconDashboard className="h-5 w-5" /> },
+    { label: "Generate Plan", href: "/generate-plan", icon: <IconFilePlus className="h-5 w-5" /> },
+    { label: "My Events", href: "/my-event", icon: <IconCalendarEvent className="h-5 w-5" /> },
+    { label: "Calendar", href: "/calendar", icon: <IconCalendar className="h-5 w-5" /> },
   ];
 
   return (
@@ -39,31 +42,40 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
           <SidebarBody className="flex flex-col justify-between gap-4 h-full">
             {/* Top section */}
             <div className="flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
-              {/* Logo */}
+              {/* Logo + Toggle */}
               <div
                 className={cn(
                   "flex items-center p-3",
-                  open ? "justify-start" : "justify-center"
+                  open ? "justify-between" : "justify-center"
                 )}
               >
-                <button
-                  className="focus:outline-none"
-                  onClick={() => setOpen(!open)}
-                  aria-label="Toggle Sidebar"
-                >
+                {/* Logo navigates home */}
+                <Link href="/" className="flex items-center">
                   {open ? <Logo /> : <LogoIcon />}
-                </button>
+                </Link>
+
+                {/* Toggle button */}
+                
               </div>
 
               {/* Navigation links */}
               <div className="mt-6 flex flex-col gap-2">
-                {links.map((link, idx) => (
-                  <SidebarLink
-                    key={idx}
-                    link={link}
-                    className="text-white hover:bg-[#3d3360] rounded-md transition-colors"
-                  />
-                ))}
+                {links.map((link, idx) => {
+                  const isActive = pathname === link.href;
+
+                  return (
+                    <SidebarLink
+                      key={idx}
+                      link={link}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                        isActive
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30"
+                          : "text-white hover:bg-[#3d3360]"
+                      )}
+                    />
+                  );
+                })}
               </div>
             </div>
 
@@ -110,24 +122,22 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
       </Sidebar>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 overflow-auto">
-        {children}
-      </div>
+      <div className="flex-1 overflow-auto">{children}</div>
     </div>
   );
 }
 
 /* Logo when sidebar is open */
 export const Logo = () => (
-  <a className="flex items-center space-x-2 text-2xl font-extrabold tracking-wider">
+  <div className="flex items-center space-x-2 text-2xl font-extrabold tracking-wider">
     <Rocket className="text-[#906ae2] w-6 h-6" />
-    <span>{LOGO_TEXT}</span>
-  </a>
+    <span>PLAN.IN</span>
+  </div>
 );
 
 /* Logo icon when sidebar is collapsed */
 export const LogoIcon = () => (
-  <a className="flex items-center justify-center">
+  <div className="flex items-center justify-center">
     <Rocket className="text-[#906ae2] w-6 h-6" />
-  </a>
+  </div>
 );

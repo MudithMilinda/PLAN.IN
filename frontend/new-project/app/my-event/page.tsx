@@ -1,50 +1,61 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { SidebarDemo } from "@/components/layout/Sidebar";
+import {SidebarDemo} from "@/components/layout/Sidebar";
 import { Calendar, MapPin, Users, Plus } from "lucide-react";
 
 interface Event {
   id: string;
-  title: string;
-  reach: string;
-  date: string;
+  event_name: string;
+  target_audience: string;
+  event_date: string;
   location: string;
-  eventType: string;
+  event_theme: string;
 }
 
 function MyEventsContent() {
   const router = useRouter();
+  const { user } = useUser();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample events data - replace with your actual data
-  const events: Event[] = [
-    {
-      id: "1",
-      title: "Parinamaya Live in Concert",
-      reach: "45.2K",
-      date: "November 15, 2025",
-      location: "Air Force Ground",
-      eventType: "Outdoor Music event",
-    },
-    {
-      id: "2",
-      title: "Parinamaya Live in Concert",
-      reach: "45.2K",
-      date: "November 15, 2025",
-      location: "Air Force Ground",
-      eventType: "Outdoor Music event",
-    },
-    {
-      id: "3",
-      title: "Parinamaya Live in Concert",
-      reach: "45.2K",
-      date: "November 15, 2025",
-      location: "Air Force Ground",
-      eventType: "Outdoor Music event",
-    },
-  ];
+  // Fetch events from Express backend using POST
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            clerkUserId: user.id
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          setEvents(data.events || []);
+        } else {
+          console.error('Error fetching events:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [user?.id]);
 
   const handleAddEvent = () => {
     router.push("/events/create");
@@ -78,14 +89,15 @@ function MyEventsContent() {
         </div>
 
         {/* Events List */}
-        <div className="space-y-4">
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
-
-        {/* Empty State - Show if no events */}
-        {events.length === 0 && (
+        {loading ? (
+          <p className="text-center text-white mt-10">Loading events...</p>
+        ) : events.length > 0 ? (
+          <div className="space-y-4">
+            {events.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-12 text-center max-w-md">
               <Calendar className="w-16 h-16 text-gray-500 mx-auto mb-4" />
@@ -93,12 +105,6 @@ function MyEventsContent() {
               <p className="text-gray-400 mb-6">
                 Get started by creating your first event
               </p>
-              <button
-                onClick={handleAddEvent}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-xl transition-all"
-              >
-                Create Your First Event
-              </button>
             </div>
           </div>
         )}
@@ -114,13 +120,12 @@ function EventCard({ event }: { event: Event }) {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Left Side - Event Info */}
         <div className="flex-1">
-          {/* Event Title & Reach */}
           <div className="mb-3">
             <h3 className="text-xl md:text-2xl font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
-              {event.title}
+              {event.event_name}
             </h3>
             <p className="text-gray-400 text-sm">
-              Reach: <span className="text-white font-semibold">{event.reach}</span>
+              Audience: <span className="text-white font-semibold">{event.target_audience}</span>
             </p>
           </div>
         </div>
@@ -132,7 +137,13 @@ function EventCard({ event }: { event: Event }) {
             <div className="p-2 bg-slate-700/50 rounded-lg">
               <Calendar className="w-4 h-4" />
             </div>
-            <span className="text-sm md:text-base">{event.date}</span>
+            <span className="text-sm md:text-base">
+              {new Date(event.event_date).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
           </div>
 
           {/* Location */}
@@ -148,7 +159,7 @@ function EventCard({ event }: { event: Event }) {
             <div className="p-2 bg-slate-700/50 rounded-lg">
               <Users className="w-4 h-4" />
             </div>
-            <span className="text-sm md:text-base">{event.eventType}</span>
+            <span className="text-sm md:text-base">{event.event_theme}</span>
           </div>
         </div>
       </div>

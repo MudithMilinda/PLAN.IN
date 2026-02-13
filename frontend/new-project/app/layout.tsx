@@ -8,6 +8,7 @@ import LoadingPage from "@/components/layout/loading";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  
   title: "PLAN.IN - AI-Powered Event Marketing",
   description: "Promote your events with AI-powered marketing",
 };
