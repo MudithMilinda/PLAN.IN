@@ -46,7 +46,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend
+        working-directory: frontend/new-project
 
     steps:
       - name: Checkout repository
@@ -57,7 +57,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: "**/package-lock.json"
+          cache-dependency-path: frontend/new-project/package-lock.json
 
 
       - name: Install dependencies
