@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-
-import LoadingPage from "@/components/layout/loading"; 
+import { dark } from "@clerk/themes";
+import "./globals.css"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  
+
   title: "PLAN.IN - AI-Powered Event Marketing",
   description: "Promote your events with AI-powered marketing",
 };
@@ -22,6 +21,7 @@ export default function RootLayout({
     <ClerkProvider
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
+      appearance={{ theme: dark }}
     >
       <html lang="en">
         <body
@@ -31,7 +31,6 @@ export default function RootLayout({
             backgroundAttachment: 'fixed', // keeps background fixed
           }}
         >
-          <LoadingPage /> {/* Optional, keeps loading effect */}
           {children}
         </body>
       </html>

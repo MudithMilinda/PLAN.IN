@@ -3,7 +3,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BackgroundLines } from "@/components/ui/background-lines";
-import BrandStrip from "@/components/Home/BrandStrip";
 
 
 export default function HeroSection() {

@@ -1,199 +1,266 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { SidebarDemo } from "@/components/layout/Sidebar";
-import { Calendar, Users, CalendarDays } from 'lucide-react';
+import {
+  CalendarDays,
+  MapPin,
+  Phone,
+  Mail,
+  Instagram,
+  Facebook,
+  Twitter,
+  Send,
+  ExternalLink,
+  Pencil,
+  Save,
+  X,
+  TrendingUp,
+  Activity,
+} from "lucide-react";
 
-// ---------------- Dashboard Content ----------------
-function DashboardContent({ eventsCount }: { eventsCount: number }) {
+interface EventItem {
+  id: string;
+  event_name: string;
+  location: string;
+  event_date: string;
+}
+
+interface ProfileForm {
+  fullName: string;
+  email: string;
+  phone: string;
+  location: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  twitterUrl: string;
+  telegramUrl: string;
+}
+
+function DashboardContent({
+  events,
+  onOpenEvent,
+  profile,
+  profileForm,
+  isEditing,
+  isSaving,
+  onStartEdit,
+  onCancelEdit,
+  onChangeProfile,
+  onSaveProfile,
+}: {
+  events: EventItem[];
+  onOpenEvent: (eventId: string) => void;
+  profile: ProfileForm;
+  profileForm: ProfileForm;
+  isEditing: boolean;
+  isSaving: boolean;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onChangeProfile: (field: keyof ProfileForm, value: string) => void;
+  onSaveProfile: () => void;
+}) {
+  const { user } = useUser();
+
+  const socialLinks = [
+    { icon: Instagram, href: profile.instagramUrl },
+    { icon: Facebook, href: profile.facebookUrl },
+    { icon: Twitter, href: profile.twitterUrl },
+    { icon: Send, href: profile.telegramUrl },
+  ];
+
+  const ongoingEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return events
+      .filter((event) => {
+        const eventDate = new Date(event.event_date);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate >= today;
+      })
+      .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+  }, [events]);
+
+  const shownEvents = useMemo(() => ongoingEvents.slice(0, 6), [ongoingEvents]);
+
   return (
-    <div
-      className="min-h-screen p-4 md:p-6"
-      style={{ background: 'linear-gradient(to bottom, #050020, #050020, #050020)' }}
-    >
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
-            Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">PLAN.IN</span>
-          </h1>
-          <p className="text-gray-400 text-sm md:text-base">Welcome back! Here's what's happening with your events.</p>
+    <div className="min-h-screen p-4 md:p-6 mt-7" style={{ background: "#050020" }}>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="grid grid-cols-1 xl:grid-cols-[1.9fr_0.9fr] gap-6 items-stretch">
+          <section className="rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] backdrop-blur-md p-5 md:p-7 shadow-[0_20px_80px_rgba(8,8,40,0.55)] h-full">
+            <div className="flex flex-col md:flex-row md:items-center gap-6 h-full">
+              <div className="flex justify-center md:justify-start">
+              <img
+                src={user?.imageUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"}
+                alt="profile"
+                className="h-28 w-28 md:h-32 md:w-32 rounded-full object-cover border-4 border-[#7f66d6]"
+              />
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                    {profile.fullName || user?.fullName || "PLAN.IN Creator"}
+                  </h1>
+                  {!isEditing ? (
+                    <button
+                      onClick={onStartEdit}
+                      className="inline-flex items-center gap-2 rounded-lg bg-[#2d2066] px-3 py-2 text-sm text-[#d8cbff] hover:bg-[#5138a3] transition-colors"
+                    >
+                      <Pencil className="h-4 w-4" /> Edit
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={onCancelEdit}
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#2f274d] px-3 py-2 text-sm text-gray-200 hover:bg-[#3d3360] transition-colors"
+                      >
+                        <X className="h-4 w-4" /> Cancel
+                      </button>
+                      <button
+                        onClick={onSaveProfile}
+                        disabled={isSaving}
+                        className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm text-white hover:bg-purple-700 disabled:opacity-60"
+                      >
+                        <Save className="h-4 w-4" /> {isSaving ? "Saving..." : "Save"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {!isEditing ? (
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <p className="text-gray-300 flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-[#b79cf8]" />
+                      {profile.email || user?.primaryEmailAddress?.emailAddress || "yourmail@example.com"}
+                    </p>
+                    <p className="text-gray-300 flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-[#b79cf8]" />
+                      {profile.phone || "+94 77 000 0000"}
+                    </p>
+                    <p className="text-gray-300 flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-[#b79cf8]" />
+                      {profile.location || "Colombo, Sri Lanka"}
+                    </p>
+                    <p className="text-gray-300 flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-[#b79cf8]" />
+                      Active events: {events.length}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Full name" value={profileForm.fullName} onChange={(e) => onChangeProfile("fullName", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Email" value={profileForm.email} onChange={(e) => onChangeProfile("email", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Phone" value={profileForm.phone} onChange={(e) => onChangeProfile("phone", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Location" value={profileForm.location} onChange={(e) => onChangeProfile("location", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Instagram URL" value={profileForm.instagramUrl} onChange={(e) => onChangeProfile("instagramUrl", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Facebook URL" value={profileForm.facebookUrl} onChange={(e) => onChangeProfile("facebookUrl", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Twitter URL" value={profileForm.twitterUrl} onChange={(e) => onChangeProfile("twitterUrl", e.target.value)} />
+                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Telegram URL" value={profileForm.telegramUrl} onChange={(e) => onChangeProfile("telegramUrl", e.target.value)} />
+                  </div>
+                )}
+
+                <div className="mt-5 flex items-center gap-3">
+                  {socialLinks.map((item, index) => (
+                    <a
+                      key={index}
+                      href={item.href || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="h-9 w-9 rounded-full bg-[#2d2066] text-[#d8cbff] hover:bg-[#5138a3] transition-colors flex items-center justify-center"
+                    >
+                      <item.icon className="h-4 w-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="grid grid-rows-2 gap-4">
+            <div className="rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 min-h-[170px] shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
+              <div className="flex items-center justify-between">
+                <div className="h-9 w-9 rounded-full bg-[#6f5bd6]/25 text-[#cdbdff] flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-[#d8d8ea] font-semibold">Total Events</p>
+              <div className="mt-2 flex items-center gap-2">
+                <p className="text-3xl font-bold text-white">{events.length}</p>
+                <span className="rounded-full bg-[#2a2a5a] px-2 py-1 text-[11px] text-[#bda9ff]">+{Math.max(events.length, 1)}%</span>
+              </div>
+              <p className="mt-3 text-xs text-[#9da0bf]">Overall events created in your workspace.</p>
+            </div>
+            <div className="rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 min-h-[170px] shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
+              <div className="flex items-center justify-between">
+                <div className="h-9 w-9 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+                  <Activity className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-[#d8d8ea] font-semibold">Ongoing Events</p>
+              <div className="mt-2 flex items-center gap-2">
+                <p className="text-3xl font-bold text-white">{ongoingEvents.length}</p>
+                <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] text-emerald-300">Live</span>
+              </div>
+              <p className="mt-3 text-xs text-[#9da0bf]">Events not passed yet, active from today onward.</p>
+            </div>
+          </section>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
-          {/* Total Reach */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-3 md:p-4 hover:bg-slate-800/70 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-400 text-xs md:text-sm font-medium">Total Reach</h3>
-              <div className="p-1 md:p-1.5 bg-purple-500/20 rounded-lg">
-                <Users className="w-3 h-3 md:w-4 md:h-4 text-purple-400" />
-              </div>
-            </div>
-            <p className="text-2xl md:text-3xl font-bold text-white">128.5K</p>
+        <section className="rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] p-5 md:p-7">
+          <div className="flex items-center justify-between gap-4 mb-5">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Ongoing Events</h2>
+            <span className="text-xs md:text-sm text-[#bda9ff] bg-[#2d2066] px-3 py-1 rounded-full">
+              {ongoingEvents.length} total
+            </span>
           </div>
 
-          {/* Active Events (Dynamic) */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-3 md:p-4 hover:bg-slate-800/70 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-400 text-xs md:text-sm font-medium">Active Events</h3>
-              <div className="p-1 md:p-1.5 bg-blue-500/20 rounded-lg">
-                <CalendarDays className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
-              </div>
-            </div>
-            <p className="text-2xl md:text-3xl font-bold text-white">{eventsCount}</p>
-          </div>
-
-          {/* Communities */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-3 md:p-4 hover:bg-slate-800/70 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-400 text-xs md:text-sm font-medium">Communities</h3>
-              <div className="p-1 md:p-1.5 bg-pink-500/20 rounded-lg">
-                <Users className="w-3 h-3 md:w-4 md:h-4 text-pink-400" />
-              </div>
-            </div>
-            <p className="text-2xl md:text-3xl font-bold text-white">65</p>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Predicted Engagement Rate */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 md:p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-purple-500/20 rounded-lg">
-                <Calendar className="w-4 h-4 text-purple-400" />
-              </div>
-              <h2 className="text-lg md:text-xl font-bold text-white">Predicted Engagement Rate per Platform</h2>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Instagram */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">Instagram</span>
-                  <span className="text-purple-400 text-sm font-semibold">8.5%</span>
-                </div>
-                <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-500"
-                    style={{ width: '85%' }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Facebook */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">Facebook</span>
-                  <span className="text-blue-400 text-sm font-semibold">6.2%</span>
-                </div>
-                <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-400 h-full rounded-full transition-all duration-500"
-                    style={{ width: '62%' }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Twitter/X */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">Twitter/X</span>
-                  <span className="text-cyan-400 text-sm font-semibold">4.8%</span>
-                </div>
-                <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full rounded-full transition-all duration-500"
-                    style={{ width: '48%' }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* TikTok */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">TikTok</span>
-                  <span className="text-pink-400 text-sm font-semibold">7.3%</span>
-                </div>
-                <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-pink-500 to-rose-400 h-full rounded-full transition-all duration-500"
-                    style={{ width: '73%' }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-slate-700/50">
-              <p className="text-xs text-gray-400">
-                <span className="text-purple-400 font-medium">AI-Powered Predictions</span> based on event type, audience demographics, and historical community data
-              </p>
-            </div>
-          </div>
-
-          {/* Recent Events */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 md:p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-blue-500/20 rounded-lg">
-                <Calendar className="w-4 h-4 text-blue-400" />
-              </div>
-              <h2 className="text-lg md:text-xl font-bold text-white">Recent Events</h2>
-            </div>
-
-            <div className="space-y-3">
-              <div className="bg-slate-700/50 rounded-lg p-3 md:p-4 hover:bg-slate-700/70 transition-all cursor-pointer">
-                <div className="flex items-start gap-3">
-                  <div className="bg-purple-500/20 rounded-lg p-2 text-center min-w-[50px]">
-                    <div className="text-purple-300 text-xs font-medium">FEB</div>
-                    <div className="text-white text-xl font-bold">25</div>
+          {shownEvents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {shownEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="rounded-2xl border border-[#3b2f6f] bg-[#130c42] p-4 hover:border-[#7c5de1] transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-white font-semibold text-base leading-snug">{event.event_name}</h3>
+                    <button
+                      onClick={() => onOpenEvent(event.id)}
+                      className="text-pink-300 bg-pink-500/20 rounded-full px-3 py-1 text-xs"
+                    >
+                      View
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-semibold text-sm md:text-base mb-1">Parinamaya Live in Concert</h3>
-                    <p className="text-gray-400 text-xs md:text-sm">Sri Lanka Exhibition Centre • 5,000 expected</p>
-                  </div>
-                  <span className="px-2 md:px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0">
-                    Active
-                  </span>
+                  <p className="mt-2 text-sm text-gray-300 flex items-center gap-1">
+                    <MapPin className="h-4 w-4 text-[#b79cf8]" />
+                    {event.location || "Location TBD"}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-300 flex items-center gap-1">
+                    <CalendarDays className="h-4 w-4 text-[#b79cf8]" />
+                    {new Date(event.event_date).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <button
+                    onClick={() => onOpenEvent(event.id)}
+                    className="mt-4 text-xs text-[#d5c6ff] flex items-center gap-1 hover:text-white transition-colors"
+                  >
+                    Open details <ExternalLink className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-              </div>
-
-              <div className="bg-slate-700/50 rounded-lg p-3 md:p-4 hover:bg-slate-700/70 transition-all cursor-pointer">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-500/20 rounded-lg p-2 text-center min-w-[50px]">
-                    <div className="text-blue-300 text-xs font-medium">MAR</div>
-                    <div className="text-white text-xl font-bold">10</div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-semibold text-sm md:text-base mb-1">Tech Innovation Summit 2026</h3>
-                    <p className="text-gray-400 text-xs md:text-sm">Colombo • 1,200 expected</p>
-                  </div>
-                  <span className="px-2 md:px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0">
-                    Scheduled
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-slate-700/50 rounded-lg p-3 md:p-4 hover:bg-slate-700/70 transition-all cursor-pointer">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-500/20 rounded-lg p-2 text-center min-w-[50px]">
-                    <div className="text-blue-300 text-xs font-medium">MAR</div>
-                    <div className="text-white text-xl font-bold">18</div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-semibold text-sm md:text-base mb-1">Startup Founders Workshop</h3>
-                    <p className="text-gray-400 text-xs md:text-sm">Virtual • 300 expected</p>
-                  </div>
-                  <span className="px-2 md:px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0">
-                    Scheduled
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
-        </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-[#4a3b85] p-10 text-center">
+              <p className="text-gray-300">No events yet. Create one from Generate Plan.</p>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
@@ -202,18 +269,54 @@ function DashboardContent({ eventsCount }: { eventsCount: number }) {
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
-  const [eventsCount, setEventsCount] = useState(0);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profile, setProfile] = useState<ProfileForm>({
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    instagramUrl: "",
+    facebookUrl: "",
+    twitterUrl: "",
+    telegramUrl: "",
+  });
+  const [profileForm, setProfileForm] = useState<ProfileForm>({
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    instagramUrl: "",
+    facebookUrl: "",
+    twitterUrl: "",
+    telegramUrl: "",
+  });
 
-  // Redirect if not signed in
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
 
-  // Fetch user's events and set count
   useEffect(() => {
-    const fetchEventsCount = async () => {
+    if (!user) return;
+    const defaults: ProfileForm = {
+      fullName: user.fullName || "",
+      email: user.primaryEmailAddress?.emailAddress || "",
+      phone: "",
+      location: "",
+      instagramUrl: "",
+      facebookUrl: "",
+      twitterUrl: "",
+      telegramUrl: "",
+    };
+    setProfile(defaults);
+    setProfileForm(defaults);
+  }, [user]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
       if (!user?.id) return;
 
       try {
@@ -225,7 +328,7 @@ export default function DashboardPage() {
 
         const data = await response.json();
         if (response.ok) {
-          setEventsCount(data.events?.length || 0);
+          setEvents(data.events || []);
         } else {
           console.error("Failed to fetch events:", data.error);
         }
@@ -234,23 +337,98 @@ export default function DashboardPage() {
       }
     };
 
-    fetchEventsCount();
+    fetchEvents();
   }, [user?.id]);
 
-  if (!isLoaded) {
-    return (
-      <div
-        className="flex h-screen items-center justify-center text-xl text-white"
-        style={{ background: 'linear-gradient(to bottom, #050020, #050020, #050020)' }}
-      >
-        Loading...
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return;
+      try {
+        const response = await fetch("http://localhost:5000/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clerkUserId: user.id }),
+        });
+        const data = await response.json();
+        if (response.ok && data.profile) {
+          const loaded: ProfileForm = {
+            fullName: data.profile.full_name || user.fullName || "",
+            email: data.profile.email || user.primaryEmailAddress?.emailAddress || "",
+            phone: data.profile.phone || "",
+            location: data.profile.location || "",
+            instagramUrl: data.profile.instagram_url || "",
+            facebookUrl: data.profile.facebook_url || "",
+            twitterUrl: data.profile.twitter_url || "",
+            telegramUrl: data.profile.telegram_url || "",
+          };
+          setProfile(loaded);
+          setProfileForm(loaded);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+    fetchProfile();
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    if (!user?.id) return;
+    setIsSaving(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerkUserId: user.id, ...profileForm }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to save profile");
+      }
+      const saved: ProfileForm = {
+        fullName: data.profile.full_name || "",
+        email: data.profile.email || "",
+        phone: data.profile.phone || "",
+        location: data.profile.location || "",
+        instagramUrl: data.profile.instagram_url || "",
+        facebookUrl: data.profile.facebook_url || "",
+        twitterUrl: data.profile.twitter_url || "",
+        telegramUrl: data.profile.telegram_url || "",
+      };
+      setProfile(saved);
+      setProfileForm(saved);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isLoaded) return null;
 
   return (
     <SidebarDemo>
-      <DashboardContent eventsCount={eventsCount} />
+      <DashboardContent
+        events={events}
+        onOpenEvent={(eventId) => router.push(`/events/${eventId}`)}
+        profile={profile}
+        profileForm={profileForm}
+        isEditing={isEditing}
+        isSaving={isSaving}
+        onStartEdit={() => setIsEditing(true)}
+        onCancelEdit={() => {
+          setProfileForm(profile);
+          setIsEditing(false);
+        }}
+        onChangeProfile={(field, value) =>
+          setProfileForm((prev) => ({
+            ...prev,
+            [field]: value,
+          }))
+        }
+        onSaveProfile={handleSaveProfile}
+      />
     </SidebarDemo>
   );
 }

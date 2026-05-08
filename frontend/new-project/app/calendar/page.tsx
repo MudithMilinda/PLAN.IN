@@ -1,765 +1,145 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  X,
-  AlertCircle,
-  Clock,
-  MapPin,
-  Users,
-  AlignLeft,
-  Check
-} from 'lucide-react';
-import { SidebarDemo } from '@/components/layout/Sidebar';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { SidebarDemo } from '@/components/layout/Sidebar';
+import { CalendarGrid } from '@/components/calendar/CalendarGrid';
+import { CalendarHeader } from '@/components/calendar/CalendarHeader';
+import { CalendarSidebar } from '@/components/calendar/CalendarSidebar';
+import { EventPopup } from '@/components/calendar/EventPopup';
+import { useCalendarEvents } from '@/hooks/useCalendarEvents';
+import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
+import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
+import type { CalendarEvent } from '@/types/calendar';
+import { getDaysInMonth } from '@/utils/calendarHelpers';
 
-interface Event {
-  id: string;
-  title: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  allDay: boolean;
-  calendar: string;
-  participants: string;
-  location: string;
-  description: string;
-  category: string;
-}
-
-interface BackendEvent {
-  id: string;
-  event_name: string;
-  event_date: string;
-  location: string;
-  event_theme: string;
-}
-
-interface NewEventData {
-  title: string;
-  startTime: string;
-  endTime: string;
-  allDay: boolean;
-  calendar: string;
-  participants: string;
-  location: string;
-  description: string;
-  category: string;
-}
-
-export default function InteractiveCalendar() {
+export default function CalendarPage() {
   const { user } = useUser();
   const dayRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [showEventModal, setShowEventModal] = useState<boolean>(false);
-  const [selectedCalendar, setSelectedCalendar] = useState<string>('my-calendar');
+  // Popup state
+  const [popupEvent, setPopupEvent] = useState<CalendarEvent | null>(null);
+  const [popupRect, setPopupRect] = useState<DOMRect | null>(null);
 
-  const [events, setEvents] = useState<Event[]>([]);
-  const [newEvent, setNewEvent] = useState<NewEventData>({
-    title: '',
-    startTime: '',
-    endTime: '',
-    allDay: false,
-    calendar: 'my-calendar',
-    participants: '',
-    location: '',
-    description: '',
-    category: ''
-  });
+  const { currentDate, selectedDate, setCurrentDate, setSelectedDate, prevMonth, nextMonth, goToday, selectDate } = useCalendarNavigation();
+  const {
+    backendEvents,
+    loadingEvents,
+    deletingId,
+    syncMessage,
+    setSyncMessage,
+    refreshEvents,
+    removeEvent,
+    getEventsForDate,
+  } = useCalendarEvents(user?.id);
 
-  const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const [overlapWarning, setOverlapWarning] = useState<Event | null>(null);
+  const { googleConnected, googleLoading, checkGoogleStatus, handleGoogleConnect, handleGoogleDisconnect } = useGoogleCalendar(user?.id);
 
-  const [myEvents, setMyEvents] = useState<BackendEvent[]>([]);
-  const [loadingMyEvents, setLoadingMyEvents] = useState(true);
-
-  const calendars = [
-    { id: 'my-calendar', name: 'My calendar', color: 'bg-yellow-500', icon: '📅' },
-    { id: 'work', name: 'Work', color: 'bg-teal-500', icon: '💼' },
-    { id: 'fun', name: 'Fun', color: 'bg-green-500', icon: '⭐' },
-    { id: 'family', name: 'Family', color: 'bg-purple-500', icon: '🐕' },
-    { id: 'important', name: 'Important', color: 'bg-red-500', icon: '🎈' },
-    { id: 'selected', name: 'Selected events', color: 'bg-gray-400', icon: '📋' }
-  ];
-
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  // 🔥 FETCH BACKEND EVENTS
   useEffect(() => {
-    const fetchMyEvents = async () => {
-      if (!user?.id) {
-        setLoadingMyEvents(false);
-        return;
-      }
+    const params = new URLSearchParams(window.location.search);
+    const connected = params.get('google_connected');
 
-      try {
-        const response = await fetch('http://localhost:5000/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clerkUserId: user.id })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setMyEvents(data.events || []);
-
-          const mappedEvents: Event[] = (data.events || []).map((event: BackendEvent) => ({
-            id: event.id,
-            title: event.event_name,
-            date: new Date(event.event_date),
-            startTime: '09:00',
-            endTime: '10:00',
-            allDay: true,
-            calendar: 'my-calendar',
-            participants: '',
-            location: event.location || '',
-            description: '',
-            category: event.event_theme || ''
-          }));
-
-          setEvents(mappedEvents);
-        } else {
-          console.error('Error fetching events:', data.error);
-        }
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      } finally {
-        setLoadingMyEvents(false);
-      }
-    };
-
-    fetchMyEvents();
-  }, [user?.id]);
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    let startingDayOfWeek = firstDay.getDay() - 1;
-    if (startingDayOfWeek === -1) startingDayOfWeek = 6;
-
-    const days = [];
-
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      const prevMonthDay = new Date(year, month, -startingDayOfWeek + i + 1);
-      days.push({ date: prevMonthDay.getDate(), isCurrentMonth: false, fullDate: prevMonthDay });
+    if (connected === 'true') {
+      setSyncMessage({ type: 'success', text: '✅ Google Calendar connected!' });
+      setTimeout(() => setSyncMessage(null), 4000);
+      window.history.replaceState({}, '', '/calendar');
+    } else if (connected === 'false') {
+      setSyncMessage({ type: 'error', text: 'Google Calendar connection failed. Try again.' });
+      setTimeout(() => setSyncMessage(null), 5000);
+      window.history.replaceState({}, '', '/calendar');
     }
 
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({ date: i, isCurrentMonth: true, fullDate: new Date(year, month, i) });
+    checkGoogleStatus();
+  }, [checkGoogleStatus, setSyncMessage]);
+
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
+
+  const days = useMemo(() => getDaysInMonth(currentDate), [currentDate]);
+  const miniDays = useMemo(() => getDaysInMonth(currentDate), [currentDate]);
+
+  const closePopup = () => {
+    setPopupEvent(null);
+    setPopupRect(null);
+  };
+
+  const handleDateClick = (date: Date) => {
+    closePopup();
+    selectDate(date);
+  };
+
+  // Called from CalendarGrid/DayCell — receives the card's DOMRect
+  const handleGridEventClick = (event: CalendarEvent, rect: DOMRect) => {
+    // Toggle: clicking the same event closes the popup
+    if (popupEvent?.id === event.id) {
+      closePopup();
+      return;
     }
-
-    const remainingDays = 42 - days.length;
-    for (let i = 1; i <= remainingDays; i++) {
-      days.push({ date: i, isCurrentMonth: false, fullDate: new Date(year, month + 1, i) });
-    }
-
-    return days;
+    setPopupEvent(event);
+    setPopupRect(rect);
   };
 
-  const getEventsForDate = (fullDate: Date | null) => {
-    if (!fullDate) return [];
-    return events.filter(event => {
-      const eventDate = new Date(event.date);
-      return (
-        eventDate.getDate() === fullDate.getDate() &&
-        eventDate.getMonth() === fullDate.getMonth() &&
-        eventDate.getFullYear() === fullDate.getFullYear()
-      );
-    });
+  // Delete button inside the popup
+  const handlePopupDelete = async (id: string) => {
+    await removeEvent(id);
+    closePopup();
   };
-
-  const checkEventOverlap = (newEventData: NewEventData): Event | null => {
-    if (!selectedDate || !newEventData.startTime || newEventData.allDay) return null;
-
-    const dayEvents = getEventsForDate(selectedDate).filter(e => !e.allDay);
-
-    const newStart = new Date(selectedDate);
-    const [startHours, startMinutes] = newEventData.startTime.split(':');
-    newStart.setHours(parseInt(startHours), parseInt(startMinutes));
-
-    const newEnd = new Date(selectedDate);
-    const [endHours, endMinutes] = newEventData.endTime.split(':');
-    newEnd.setHours(parseInt(endHours), parseInt(endMinutes));
-
-    for (const event of dayEvents) {
-      const eventStart = new Date(event.date);
-      const [eStartHours, eStartMinutes] = event.startTime.split(':');
-      eventStart.setHours(parseInt(eStartHours), parseInt(eStartMinutes));
-
-      const eventEnd = new Date(event.date);
-      const [eEndHours, eEndMinutes] = event.endTime.split(':');
-      eventEnd.setHours(parseInt(eEndHours), parseInt(eEndMinutes));
-
-      if (
-        (newStart >= eventStart && newStart < eventEnd) ||
-        (newEnd > eventStart && newEnd <= eventEnd) ||
-        (newStart <= eventStart && newEnd >= eventEnd)
-      ) {
-        return event;
-      }
-    }
-    return null;
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
-  };
-
-  const handleToday = () => {
-    setCurrentDate(new Date());
-  };
-
-  const handleDateClick = (fullDate: Date | null) => {
-    if (fullDate) {
-      const selectedDateAtNoon = new Date(
-        fullDate.getFullYear(),
-        fullDate.getMonth(),
-        fullDate.getDate(),
-        12,
-        0,
-        0
-      );
-      setSelectedDate(selectedDateAtNoon);
-      setShowEventModal(true);
-      setOverlapWarning(null);
-      setEditingEventId(null);
-      setNewEvent({
-        title: '',
-        startTime: '',
-        endTime: '',
-        allDay: false,
-        calendar: selectedCalendar,
-        participants: '',
-        location: '',
-        description: '',
-        category: ''
-      });
-    }
-  };
-
-  const handleAddEvent = () => {
-    if (newEvent.title && selectedDate) {
-      if (!newEvent.allDay) {
-        const overlap = checkEventOverlap(newEvent);
-        if (overlap && overlap.id !== editingEventId) {
-          setOverlapWarning(overlap);
-          return;
-        }
-      }
-
-      if (editingEventId) {
-        setEvents(events.map(event =>
-          event.id === editingEventId
-            ? {
-                ...event,
-                title: newEvent.title,
-                date: selectedDate,
-                startTime: newEvent.startTime || '00:00',
-                endTime: newEvent.endTime || '01:00',
-                allDay: newEvent.allDay,
-                calendar: newEvent.calendar,
-                participants: newEvent.participants,
-                location: newEvent.location,
-                description: newEvent.description,
-                category: newEvent.category
-              }
-            : event
-        ));
-      } else {
-        setEvents([...events, {
-          id: Date.now().toString(),
-          title: newEvent.title,
-          date: selectedDate,
-          startTime: newEvent.startTime || '00:00',
-          endTime: newEvent.endTime || '01:00',
-          allDay: newEvent.allDay,
-          calendar: newEvent.calendar,
-          participants: newEvent.participants,
-          location: newEvent.location,
-          description: newEvent.description,
-          category: newEvent.category
-        }]);
-      }
-
-      setNewEvent({
-        title: '',
-        startTime: '',
-        endTime: '',
-        allDay: false,
-        calendar: selectedCalendar,
-        participants: '',
-        location: '',
-        description: '',
-        category: ''
-      });
-      setShowEventModal(false);
-      setOverlapWarning(null);
-      setEditingEventId(null);
-    }
-  };
-
-  const handleDeleteEvent = (eventId: string) => {
-    setEvents(events.filter(e => e.id !== eventId));
-    setShowEventModal(false);
-    setEditingEventId(null);
-  };
-
-  const handleEditEvent = (event: Event, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedDate(new Date(event.date));
-    setNewEvent({
-      title: event.title,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      allDay: event.allDay,
-      calendar: event.calendar,
-      participants: event.participants || '',
-      location: event.location || '',
-      description: event.description || '',
-      category: event.category || ''
-    });
-    setEditingEventId(event.id);
-    setShowEventModal(true);
-    setOverlapWarning(null);
-  };
-
-  const isToday = (fullDate: Date) => {
-    const today = new Date();
-    return (
-      fullDate.getDate() === today.getDate() &&
-      fullDate.getMonth() === today.getMonth() &&
-      fullDate.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const days = getDaysInMonth(currentDate);
-  const miniDays = getDaysInMonth(currentDate);
-
-  const CalendarContent = () => (
-    <div className="flex h-screen bg-white">
-      {/* Sidebar */}
-      <div className="w-64 bg-indigo-950 p-4 flex flex-col">
-        {/* New Event Button */}
-        <button
-          onClick={() => {
-            setSelectedDate(new Date());
-            setShowEventModal(true);
-          }}
-          className="mb-6 px-4 py-3 bg-indigo-800 hover:bg-indigo-700 text-indigo-100 rounded-full shadow-md flex items-center gap-3 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="font-medium">New event</span>
-        </button>
-
-        {/* Mini Calendar */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-indigo-100">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </span>
-            <div className="flex gap-1">
-              <button onClick={handlePrevMonth} className="p-1 hover:bg-indigo-800 rounded">
-                <ChevronLeft className="w-4 h-4 text-indigo-200" />
-              </button>
-              <button onClick={handleNextMonth} className="p-1 hover:bg-indigo-800 rounded">
-                <ChevronRight className="w-4 h-4 text-indigo-200" />
-              </button>
-            </div>
-          </div>
-
-          {/* Mini Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1 text-xs">
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-              <div key={i} className="text-center text-indigo-300 font-medium py-1">
-                {day}
-              </div>
-            ))}
-            {miniDays.map((day, index) => {
-              const isTodayDate = isToday(day.fullDate);
-              return (
-                <div
-                  key={index}
-                  className={`
-                    text-center py-1 rounded-full cursor-pointer text-xs
-                    ${day.isCurrentMonth ? 'text-indigo-100' : 'text-indigo-500'}
-                    ${isTodayDate ? 'bg-indigo-500 text-white font-bold' : 'hover:bg-indigo-800'}
-                  `}
-                  onClick={() => handleDateClick(day.fullDate)}
-                >
-                  {day.date}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* My Events */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="mb-2 text-xs font-semibold text-indigo-300">
-            MY EVENTS 📅
-          </div>
-
-          {loadingMyEvents ? (
-            <p className="text-indigo-300 text-sm">Loading events...</p>
-          ) : myEvents.length > 0 ? (
-            <div className="space-y-2">
-              {myEvents.map(event => (
-                <div
-                  key={event.id}
-                  onClick={() => {
-                    const eventDate = new Date(event.event_date);
-                    const noonDate = new Date(
-                      eventDate.getFullYear(),
-                      eventDate.getMonth(),
-                      eventDate.getDate(),
-                      12,
-                      0,
-                      0
-                    );
-
-                    setCurrentDate(noonDate);
-                    setSelectedDate(noonDate);
-
-                    setTimeout(() => {
-                      const key = noonDate.toDateString();
-                      const el = dayRefs.current[key];
-                      if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }
-                    }, 100);
-                  }}
-                  className="group flex flex-col gap-1 py-2 px-3 rounded-lg bg-indigo-900/40 hover:bg-indigo-800 cursor-pointer transition"
-                >
-                  <span className="text-sm font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
-                    {event.event_name}
-                  </span>
-                  <span className="text-xs text-indigo-300">
-                    {new Date(event.event_date).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </span>
-                  {event.location && (
-                    <span className="text-xs text-indigo-400 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> {event.location}
-                    </span>
-                  )}
-                  {event.event_theme && (
-                    <span className="text-xs text-indigo-400 flex items-center gap-1">
-                      <Users className="w-3 h-3" /> {event.event_theme}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-indigo-400 text-sm">No events yet</p>
-          )}
-        </div>
-      </div>
-
-      {/* Main Calendar Area */}
-      <div className="flex-1 flex flex-col bg-white">
-        {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-white">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleToday}
-              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center gap-2 transition-all"
-            >
-              <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center text-xs">
-                {new Date().getDate()}
-              </div>
-              Today
-            </button>
-            <div className="flex gap-1">
-              <button onClick={handlePrevMonth} className="p-2 hover:bg-gray-100 rounded">
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded">
-                <ChevronRight className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-            <h2 className="text-xl font-normal text-gray-800">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h2>
-          </div>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="flex-1 overflow-auto bg-white">
-          <div className="grid grid-cols-7 border-t border-l border-gray-200">
-            {/* Day Headers */}
-            {daysOfWeek.map((day, index) => (
-              <div key={index} className="border-r border-b border-gray-200 p-2 text-sm font-semibold text-gray-700 bg-gray-50 text-center">
-                {day}
-              </div>
-            ))}
-
-            {/* Calendar Days */}
-            {days.map((day, index) => {
-              const dayEvents = getEventsForDate(day.fullDate);
-              const isTodayDate = isToday(day.fullDate);
-              const isSelected =
-                selectedDate &&
-                day.fullDate.toDateString() === selectedDate.toDateString();
-
-              return (
-                <div
-                  key={index}
-                  ref={(el) => {
-                    const key = day.fullDate.toDateString();
-                    dayRefs.current[key] = el;
-                  }}
-                  onClick={() => handleDateClick(day.fullDate)}
-                  className={`border-r border-b border-gray-200 p-2 min-h-32 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    isSelected ? 'bg-indigo-50 border-2 border-indigo-400' : 'bg-white'
-                  } ${
-                    !day.isCurrentMonth ? 'text-gray-400' : 'text-gray-900'
-                  }`}
-                >
-                  <div
-                    className={`text-sm font-medium mb-1 ${
-                      isTodayDate
-                        ? 'bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto'
-                        : ''
-                    }`}
-                  >
-                    {day.date}
-                  </div>
-                  <div className="space-y-1">
-                    {dayEvents.map(event => {
-                      const cal = calendars.find(c => c.id === event.calendar);
-                      return (
-                        <div
-                          key={event.id}
-                          onClick={(e) => handleEditEvent(event, e)}
-                          className={`text-xs px-2 py-1 rounded-md font-medium shadow-sm ${
-                            cal?.color || 'bg-indigo-600'
-                          } text-white truncate hover:brightness-110 cursor-pointer transition`}
-                          title={`${event.title} • ${event.location} • ${event.category}`}
-                        >
-                          {event.allDay
-                            ? event.title.length > 18
-                              ? event.title.slice(0, 18) + '...'
-                              : event.title
-                            : `${event.startTime} ${
-                                event.title.length > 15
-                                  ? event.title.slice(0, 15) + '...'
-                                  : event.title
-                              }`}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Event Modal */}
-      {showEventModal && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-xl border border-gray-200">
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {editingEventId ? 'Edit Event' : 'New Event'}
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowEventModal(false);
-                    setOverlapWarning(null);
-                    setEditingEventId(null);
-                  }}
-                  className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {overlapWarning && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-red-800 font-medium text-sm">Event Overlap Detected!</p>
-                    <p className="text-red-700 text-xs mt-1">
-                      Conflicts with "{overlapWarning.title}" at {overlapWarning.startTime}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <input
-                type="text"
-                value={newEvent.title}
-                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                className="w-full text-2xl border-0 border-b border-gray-300 focus:border-indigo-500 outline-none px-0 py-2 text-gray-900 placeholder-gray-400"
-                placeholder="Add title"
-              />
-
-              <div className="flex items-center gap-3 text-gray-700">
-                <Clock className="w-5 h-5 text-gray-500" />
-                <input
-                  type="date"
-                  value={selectedDate?.toISOString().split('T')[0] || ''}
-                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900"
-                />
-              </div>
-
-              {!newEvent.allDay && (
-                <div className="flex items-center gap-3 ml-8 text-gray-700">
-                  <input
-                    type="time"
-                    value={newEvent.startTime}
-                    onChange={(e) => {
-                      setNewEvent({ ...newEvent, startTime: e.target.value });
-                      setOverlapWarning(null);
-                    }}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900"
-                  />
-                  <span className="text-gray-500">–</span>
-                  <input
-                    type="time"
-                    value={newEvent.endTime}
-                    onChange={(e) => {
-                      setNewEvent({ ...newEvent, endTime: e.target.value });
-                      setOverlapWarning(null);
-                    }}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900"
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 ml-8">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newEvent.allDay}
-                    onChange={(e) => setNewEvent({ ...newEvent, allDay: e.target.checked })}
-                    className="w-4 h-4 text-indigo-600 border-indigo-300 rounded accent-indigo-600"
-                  />
-                  <span className="text-sm text-gray-700">All day</span>
-                </label>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  value={newEvent.participants}
-                  onChange={(e) => setNewEvent({ ...newEvent, participants: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900 placeholder-gray-400"
-                  placeholder="Add participants"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  value={newEvent.location}
-                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900 placeholder-gray-400"
-                  placeholder="Add location"
-                />
-              </div>
-
-              {/* Category Input */}
-              <div className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  value={newEvent.category}
-                  onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900 placeholder-gray-400"
-                  placeholder="Event category"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 shrink-0"></div>
-                <select
-                  value={newEvent.calendar}
-                  onChange={(e) => setNewEvent({ ...newEvent, calendar: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 text-gray-900"
-                >
-                  {calendars.map(cal => (
-                    <option key={cal.id} value={cal.id}>
-                      {cal.icon} {cal.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <AlignLeft className="w-5 h-5 text-gray-500 mt-2" />
-                <textarea
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500 min-h-24 text-gray-900 placeholder-gray-400"
-                  placeholder="Add description"
-                />
-              </div>
-
-              <div className="flex justify-between items-center gap-3 pt-4">
-                {editingEventId && (
-                  <button
-                    onClick={() => handleDeleteEvent(editingEventId)}
-                    className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-medium transition-all"
-                  >
-                    Delete
-                  </button>
-                )}
-                <div className="flex gap-3 ml-auto">
-                  <button
-                    onClick={() => {
-                      setShowEventModal(false);
-                      setEditingEventId(null);
-                    }}
-                    className="px-6 py-2 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded font-medium transition-all"
-                  >
-                    More options
-                  </button>
-                  <button
-                    onClick={handleAddEvent}
-                    className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium transition-all"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <SidebarDemo>
-      <CalendarContent />
+      <div className="flex h-screen bg-white">
+        <CalendarSidebar
+          syncMessage={syncMessage}
+          googleConnected={googleConnected}
+          googleLoading={googleLoading}
+          loadingEvents={loadingEvents}
+          backendEvents={backendEvents}
+          deletingId={deletingId}
+          currentDate={currentDate}
+          miniDays={miniDays}
+          dayRefs={dayRefs}
+          onGoogleConnect={handleGoogleConnect}
+          onGoogleDisconnect={() => handleGoogleDisconnect(setSyncMessage)}
+          onPrevMonth={prevMonth}
+          onNextMonth={nextMonth}
+          onDateClick={handleDateClick}
+          onDeleteEvent={removeEvent}
+          onNavigateEventDate={(d) => {
+            setCurrentDate(d);
+            setSelectedDate(d);
+          }}
+        />
+
+        <div className="flex flex-1 flex-col bg-white">
+          <CalendarHeader
+            currentDate={currentDate}
+            googleConnected={googleConnected}
+            onToday={goToday}
+            onPrevMonth={prevMonth}
+            onNextMonth={nextMonth}
+          />
+          <CalendarGrid
+            days={days}
+            selectedDate={selectedDate}
+            getEventsForDate={getEventsForDate}
+            dayRefs={dayRefs}
+            onDateClick={handleDateClick}
+            onEventClick={handleGridEventClick}
+          />
+        </div>
+
+        {/* Google Calendar style floating popup */}
+        {popupEvent && popupRect && (
+          <EventPopup
+            event={popupEvent}
+            anchorRect={popupRect}
+            onClose={closePopup}
+            onDelete={handlePopupDelete}
+            deletingId={deletingId}
+          />
+        )}
+      </div>
     </SidebarDemo>
   );
 }

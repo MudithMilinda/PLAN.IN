@@ -1,0 +1,8 @@
+export const categoryTemplates = {
+  'Music Concerts': { channels: ['Instagram', 'TikTok', 'Facebook Events', 'YouTube Ads', 'Spotify Ads'], contentFocus: 'artist spotlights, teaser clips, countdown posts, behind-the-scenes', keyTactics: 'influencer partnerships, early bird ticketing, venue walkthroughs' },
+  'Baila Concerts': { channels: ['Facebook', 'WhatsApp Groups', 'Instagram', 'Radio Ads', 'YouTube'], contentFocus: 'community vibes, past event highlights, artist announcements, fan testimonials', keyTactics: 'community group promotions, local influencers, family package deals' },
+  'Party Music Events': { channels: ['Instagram', 'TikTok', 'Snapchat', 'Facebook Events', 'Club Mailing Lists'], contentFocus: 'DJ previews, venue hype, dress code, drink promos', keyTactics: 'guestlist signups, early bird offers, collab with nightlife pages' },
+  'DJ / Club Events': { channels: ['Instagram', 'SoundCloud', 'Resident Advisor', 'Facebook Events', 'TikTok'], contentFocus: 'DJ mixes, lineup reveals, throwback event photos, crowd energy clips', keyTactics: 'table booking promotions, pre-sale tickets, DJ guest takeovers on social' },
+  'Music Festivals': { channels: ['Instagram', 'YouTube', 'TikTok', 'Billboards', 'Email Newsletters', 'Spotify'], contentFocus: 'multi-artist reveals, campsite vibes, lineup posters, previous year highlights', keyTactics: 'phase lineup reveals, VIP packages, merchandise pre-orders, media partnerships' },
+  'Classical & Carnatic Music Events': { channels: ['Facebook', 'WhatsApp', 'Email Newsletters', 'Newspapers', 'YouTube'], contentFocus: 'artist bios, cultural significance, past performance clips, testimonials', keyTactics: 'cultural organization partnerships, school/university outreach, patron sponsorships' },
+};

@@ -32,17 +32,6 @@ export default function FeaturesGrid() {
       }
     }
   };
-
-  // heading animation variant
-  const headingVariants: Variants = {
-    offscreen: { opacity: 0, y: 40 },
-    onscreen: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { type: 'spring', bounce: 0.25, duration: 1 } 
-    }
-  };
-
   return (
     <div id="services" className="px-8 py-20 max-w-6xl mx-auto">
       {/* Animated Heading */}

@@ -1,7 +1,6 @@
-// components/layout/Sidebar.tsx
 "use client";
 
-import React, { useState, ReactNode } from "react";
+import React, { useState, ReactNode, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/aceternity-sidebar";
 import {
   IconDashboard,
@@ -16,16 +15,26 @@ import { useUser, SignedIn, SignOutButton, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const LOGO_TEXT = "PLAN.IN";
-
 interface SidebarDemoProps {
   children: ReactNode;
 }
 
 export function SidebarDemo({ children }: SidebarDemoProps) {
   const { user } = useUser();
-  const [open, setOpen] = useState(true);
-  const pathname = usePathname();
+  const [open, setOpen] = useState(true);  const pathname = usePathname();
+
+  // ✅ Responsive handling
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setOpen(!mobile); // auto collapse on mobile
+    };
+
+    handleResize(); // run on mount
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const links = [
     { label: "Dashboard", href: "/dashboard", icon: <IconDashboard className="h-5 w-5" /> },
@@ -42,23 +51,20 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
           <SidebarBody className="flex flex-col justify-between gap-4 h-full">
             {/* Top section */}
             <div className="flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
-              {/* Logo + Toggle */}
+              
+              {/* Logo */}
               <div
                 className={cn(
                   "flex items-center p-3",
                   open ? "justify-between" : "justify-center"
                 )}
               >
-                {/* Logo navigates home */}
                 <Link href="/" className="flex items-center">
                   {open ? <Logo /> : <LogoIcon />}
                 </Link>
-
-                {/* Toggle button */}
-                
               </div>
 
-              {/* Navigation links */}
+              {/* Navigation */}
               <div className="mt-6 flex flex-col gap-2">
                 {links.map((link, idx) => {
                   const isActive = pathname === link.href;
@@ -99,7 +105,9 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
                   />
                   {open && user && (
                     <p className="ml-2 text-sm font-medium truncate">
-                      {user.fullName || user.primaryEmailAddress?.emailAddress || "User"}
+                      {user.fullName ||
+                        user.primaryEmailAddress?.emailAddress ||
+                        "User"}
                     </p>
                   )}
                 </div>
@@ -127,7 +135,7 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
   );
 }
 
-/* Logo when sidebar is open */
+/* Logo when open */
 export const Logo = () => (
   <div className="flex items-center space-x-2 text-2xl font-extrabold tracking-wider">
     <Rocket className="text-[#906ae2] w-6 h-6" />
@@ -135,7 +143,7 @@ export const Logo = () => (
   </div>
 );
 
-/* Logo icon when sidebar is collapsed */
+/* Logo when collapsed */
 export const LogoIcon = () => (
   <div className="flex items-center justify-center">
     <Rocket className="text-[#906ae2] w-6 h-6" />

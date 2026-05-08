@@ -57,12 +57,18 @@ export default function Navbar() {
             </SignedOut>
 
             <SignedIn>
-              <Link href="/dashboard">
-                <button className="px-5 py-2 font-semibold bg-[#3E3466] hover:bg-[#6A2EEF] rounded-full">
-                  Dashboard
-                </button>
-              </Link>
-              <UserButton appearance={{ elements: { avatarBox: "w-10 h-10" } }} />
+
+              <UserButton appearance={{ elements: { avatarBox: "w-10 h-10" } }}>
+                <UserButton.MenuItems>
+
+                  <UserButton.Link
+                    label="Dashboard"
+                    labelIcon={<Rocket className="w-4 h-4" />}
+                    href="/dashboard"
+                  />
+
+                </UserButton.MenuItems>
+              </UserButton>
             </SignedIn>
           </div>
 
@@ -77,46 +83,46 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-{isMobileMenuOpen && (
-  <div className="md:hidden bg-[#1A103B] w-full px-6 py-6 mt-2 rounded-b-2xl shadow-xl">
-    <div className="flex flex-col gap-4">
-      {navItems.map((item, idx) => (
-        <a
-          key={idx}
-          href={item.link}
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="w-full text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-[#2D2350] transition"
-        >
-          {item.name}
-        </a>
-      ))}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-[#1A103B] w-full px-6 py-6 mt-2 rounded-b-2xl shadow-xl">
+          <div className="flex flex-col gap-4">
+            {navItems.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.link}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-[#2D2350] transition"
+              >
+                {item.name}
+              </a>
+            ))}
 
-      <SignedOut>
-        <SignUpButton forceRedirectUrl="/dashboard">
-          <button className="w-full py-3 rounded-lg bg-[#3E3466] font-semibold text-white">
-            Sign Up
-          </button>
-        </SignUpButton>
+            <SignedOut>
+              <SignUpButton forceRedirectUrl="/dashboard">
+                <button className="w-full py-3 rounded-lg bg-[#3E3466] font-semibold text-white">
+                  Sign Up
+                </button>
+              </SignUpButton>
 
-        <SignInButton forceRedirectUrl="/dashboard">
-          <button className="w-full py-3 rounded-lg bg-[#6A2EEF] font-bold text-white shadow-md">
-            Log In
-          </button>
-        </SignInButton>
-      </SignedOut>
+              <SignInButton forceRedirectUrl="/dashboard">
+                <button className="w-full py-3 rounded-lg bg-[#6A2EEF] font-bold text-white shadow-md">
+                  Log In
+                </button>
+              </SignInButton>
+            </SignedOut>
 
-      <SignedIn>
-        <Link
-          href="/dashboard"
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="w-full text-center py-3 rounded-lg bg-[#3E3466] font-semibold text-white"
-        >
-          Dashboard
-        </Link>
-      </SignedIn>
-    </div>
-  </div>
-)}
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-3 rounded-lg bg-[#3E3466] font-semibold text-white"
+              >
+                Dashboard
+              </Link>
+            </SignedIn>
+          </div>
+        </div>
+      )}
 
     </nav>
   );
