@@ -353,10 +353,11 @@ function EventFormContent({ userId }: { userId?: string }) {
                   value={formData.eventDate}
                   onChange={handleChange}
                   onBlur={() => handleBlur("eventDate")}
-                  className={`w-full rounded-lg border bg-slate-900/50 py-3 pr-4 pl-12 text-white transition-all focus:outline-none ${errors.eventDate && touched.eventDate
-                      ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                      : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
-                    }`}
+                  className={`w-full rounded-lg border bg-slate-900/50 py-3 pr-4 pl-12 text-white transition-all focus:outline-none ${
+  errors.eventDate && touched.eventDate
+    ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+    : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
+}`}
                   style={{ colorScheme: "dark" }}
                 />
               </div>
