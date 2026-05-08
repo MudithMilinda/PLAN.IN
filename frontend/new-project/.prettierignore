@@ -1,0 +1,5 @@
+.flowbite-react/
+node_modules/
+.next/
+dist/
+build/

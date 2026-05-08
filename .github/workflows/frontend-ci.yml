@@ -35,10 +35,16 @@ jobs:
         run: npm run lint --if-present
 
       - name: Check formatting
-        run: npm run format:check --if-present
+        run: |
+            npx prettier . --write
+            git diff --exit-code
 
       - name: Build project
         run: npm run build
+
+
+
+
 
   backend:
     name: Backend CI
