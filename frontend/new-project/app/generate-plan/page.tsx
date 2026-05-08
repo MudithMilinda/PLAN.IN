@@ -138,8 +138,9 @@ function EventFormContent({ userId }: { userId?: string }) {
       }
       const result = await res.json();
       setGeneratedResult(result);
-    } catch (err: any) {
-      alert("Something went wrong ❌ — " + err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      alert("Something went wrong ❌ — " + errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -393,7 +394,14 @@ const priorityColors: Record<string, string> = {
 };
 const budgetColors = ["bg-purple-500", "bg-pink-500", "bg-blue-500", "bg-cyan-500", "bg-orange-500", "bg-green-500"];
 
-function MarketingPlanDisplay({ plan, event, onBack }: { plan: MarketingPlan; event: any; onBack: () => void }) {
+interface EventData {
+  event_name: string;
+  event_date: string;
+  location?: string;
+  event_theme?: string;
+}
+
+function MarketingPlanDisplay({ plan, event, onBack }: { plan: MarketingPlan; event: EventData; onBack: () => void }) {
   return (
     <div className="min-h-screen p-4 md:p-6 mt-7" style={{ background: "#050020" }}>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -530,7 +538,7 @@ function MarketingPlanDisplay({ plan, event, onBack }: { plan: MarketingPlan; ev
           <div className="space-y-2">
             {plan.keyMessages?.map((msg, i) => (
               <div key={i} className="flex items-start gap-3 bg-pink-500/5 border border-pink-500/20 rounded-xl p-3">
-                <span className="text-pink-400 text-lg">"</span>
+                <span className="text-pink-400 text-lg">&quot;</span>
                 <p className="text-gray-300 text-sm">{msg}</p>
               </div>
             ))}

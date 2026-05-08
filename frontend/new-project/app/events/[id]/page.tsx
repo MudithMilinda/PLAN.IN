@@ -93,7 +93,7 @@ function PostTypeIcon({ type }: { type: string }) {
     const t = type.toLowerCase();
     if (t.includes("video") || t.includes("reel")) return <Video className="w-3.5 h-3.5" />;
     if (t.includes("carousel")) return <Layers className="w-3.5 h-3.5" />;
-    return <Image className="w-3.5 h-3.5" />;
+    return <Image className="w-3.5 h-3.5" aria-label="Post type icon" />;
 }
 
 // ─── Weekly Content Calendar ──────────────────────────────────────────────────
@@ -228,7 +228,7 @@ function EventDetailContent() {
                 const data = await response.json();
                 if (!response.ok) { setError(data.error || "Failed to load event"); return; }
                 setEvent(data.event);
-            } catch (err) {
+            } catch {
                 setError("Could not connect to server");
             } finally {
                 setLoading(false);
@@ -431,7 +431,7 @@ function EventDetailContent() {
                             <div className="space-y-2">
                                 {plan.keyMessages?.map((msg, i) => (
                                     <div key={i} className="flex items-start gap-3 bg-pink-500/5 border border-pink-500/20 rounded-xl p-3">
-                                        <span className="text-pink-400 text-lg">"</span>
+                                        <span className="text-pink-400 text-lg">&quot;</span>
                                         <p className="text-gray-300 text-sm">{msg}</p>
                                     </div>
                                 ))}

@@ -95,7 +95,7 @@ function DashboardContent({
               <div className="flex justify-center md:justify-start">
               <img
                 src={user?.imageUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"}
-                alt="profile"
+                alt="User profile picture"
                 className="h-28 w-28 md:h-32 md:w-32 rounded-full object-cover border-4 border-[#7f66d6]"
               />
               </div>

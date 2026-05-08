@@ -39,7 +39,7 @@ export function EventModal({ show, selectedDate, newEvent, editingEventId, delet
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
               <div>
                 <p className="text-sm font-medium text-red-800">Event Overlap Detected!</p>
-                <p className="mt-1 text-xs text-red-700">Conflicts with "{overlapWarning.title}" at {overlapWarning.startTime}</p>
+                <p className="mt-1 text-xs text-red-700">Conflicts with &quot;{overlapWarning.title}&quot; at {overlapWarning.startTime}</p>
               </div>
             </div>
           )}

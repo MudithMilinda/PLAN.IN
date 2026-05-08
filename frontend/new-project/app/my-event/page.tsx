@@ -80,7 +80,7 @@ function MyEventsContent() {
         const data = await response.json();
         alert("Delete failed: " + (data.error || "Unknown error"));
       }
-    } catch (err) {
+    } catch {
       alert("Could not connect to server");
     } finally {
       setDeleting(false);
@@ -169,7 +169,7 @@ function MyEventsContent() {
               You are about to delete
             </p>
             <p className="text-white font-semibold text-center mb-4">
-              "{deleteModal.event.event_name}"
+              &quot;{deleteModal.event.event_name}&quot;
             </p>
             <p className="text-gray-500 text-xs text-center mb-6">
               This will permanently delete the event, all content posts, and remove everything from Google Calendar. This action cannot be undone.
