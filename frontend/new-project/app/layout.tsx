@@ -4,7 +4,10 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "PLAN.IN - AI-Powered Event Marketing",
@@ -20,15 +23,18 @@ export default function RootLayout({
     <ClerkProvider
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
-      appearance={{ theme: dark }}
+      appearance={{
+        baseTheme: dark,
+      }}
     >
       <html lang="en">
         <body
           className={`${inter.className} min-h-screen text-white`}
           style={{
             backgroundColor: "#050020",
-            backgroundAttachment: "fixed", // keeps background fixed
+            backgroundAttachment: "fixed",
           }}
+          suppressHydrationWarning
         >
           {children}
         </body>
