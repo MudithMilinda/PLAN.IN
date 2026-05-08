@@ -89,7 +89,7 @@ interface MarketingPlan {
 
 interface ApiResult {
   marketingPlan: MarketingPlan;
-  event: FormData & { eventName: string };
+  event: EventData;
 }
 
 // ─── PAGE WRAPPER ─────────────────────────────────────────────────────────────
@@ -195,7 +195,18 @@ function EventFormContent({ userId }: { userId?: string }) {
         throw new Error(errorData.error || "Failed to generate plan");
       }
       const result = await res.json();
-      setGeneratedResult(result);
+
+      const normalizedResult: ApiResult = {
+        marketingPlan: result.marketingPlan,
+        event: {
+          eventName: result.event.event_name,
+          eventDate: result.event.event_date,
+          location: result.event.location,
+          eventTheme: result.event.event_theme,
+        },
+      };
+
+      setGeneratedResult(normalizedResult);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       alert("Something went wrong ❌ — " + errorMessage);
@@ -342,11 +353,10 @@ function EventFormContent({ userId }: { userId?: string }) {
                   value={formData.eventDate}
                   onChange={handleChange}
                   onBlur={() => handleBlur("eventDate")}
-                  className={`w-full rounded-lg border bg-slate-900/50 py-3 pr-4 pl-12 text-white transition-all focus:outline-none ${
-                    errors.eventDate && touched.eventDate
-                      ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                      : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
-                  }`}
+                  className={`w-full rounded-lg border bg-slate-900/50 py-3 pr-4 pl-12 text-white transition-all focus:outline-none ${errors.eventDate && touched.eventDate
+                    ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
+                    }`}
                   style={{ colorScheme: "dark" }}
                 />
               </div>
@@ -612,10 +622,10 @@ const budgetColors = [
 ];
 
 interface EventData {
-  event_name: string;
-  event_date: string;
+  eventName: string;
+  eventDate: string;
   location?: string;
-  event_theme?: string;
+  eventTheme?: string;
 }
 
 function MarketingPlanDisplay({
