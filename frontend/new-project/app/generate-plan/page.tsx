@@ -462,6 +462,7 @@ function PostTypeIcon({ type }: { type: string }) {
     return <Video className="h-3.5 w-3.5" />;
   if (t.includes("carousel")) return <Layers className="h-3.5 w-3.5" />;
   if (t.includes("story")) return <Instagram className="h-3.5 w-3.5" />;
+  // eslint-disable-next-line jsx-a11y/alt-text
   return <Image className="h-3.5 w-3.5" />;
 }
 

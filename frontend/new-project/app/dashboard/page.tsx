@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { SidebarDemo } from "@/components/layout/Sidebar";
@@ -99,13 +100,15 @@ function DashboardContent({
           <section className="h-full rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] p-5 shadow-[0_20px_80px_rgba(8,8,40,0.55)] backdrop-blur-md md:p-7">
             <div className="flex h-full flex-col gap-6 md:flex-row md:items-center">
               <div className="flex justify-center md:justify-start">
-                <img
+                <Image
                   src={
                     user?.imageUrl ||
                     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
                   }
                   alt="User profile picture"
-                  className="h-28 w-28 rounded-full border-4 border-[#7f66d6] object-cover md:h-32 md:w-32"
+                  width={128}
+                  height={128}
+                  className="rounded-full border-4 border-[#7f66d6] object-cover md:h-32 md:w-32"
                 />
               </div>
 
