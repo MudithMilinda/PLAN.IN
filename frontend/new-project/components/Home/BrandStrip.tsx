@@ -10,26 +10,19 @@ import {
 
 export default function SocialStrip() {
   return (
-    <div
-      className="
-        py-12 
-        rounded-3xl 
-        overflow-hidden
-        bg-[#050020]     /* SOLID background only */
-      "
-    >
+    <div className="/* SOLID background only */ overflow-hidden rounded-3xl bg-[#050020] py-12">
       {/* Title */}
-      <h2 className="text-center text-gray-200 text-xl font-semibold mb-12">
+      <h2 className="mb-12 text-center text-xl font-semibold text-gray-200">
         Follow Us on Social Media
       </h2>
 
       {/* Icons */}
       <div className="flex justify-center gap-16">
-        <FaFacebookF className="text-gray-300 text-4xl hover:text-white transition-all duration-300" />
-        <FaInstagram className="text-gray-300 text-4xl hover:text-white transition-all duration-300" />
-        <FaTwitter className="text-gray-300 text-4xl hover:text-white transition-all duration-300" />
-        <FaLinkedinIn className="text-gray-300 text-4xl hover:text-white transition-all duration-300" />
-        <FaYoutube className="text-gray-300 text-4xl hover:text-white transition-all duration-300" />
+        <FaFacebookF className="text-4xl text-gray-300 transition-all duration-300 hover:text-white" />
+        <FaInstagram className="text-4xl text-gray-300 transition-all duration-300 hover:text-white" />
+        <FaTwitter className="text-4xl text-gray-300 transition-all duration-300 hover:text-white" />
+        <FaLinkedinIn className="text-4xl text-gray-300 transition-all duration-300 hover:text-white" />
+        <FaYoutube className="text-4xl text-gray-300 transition-all duration-300 hover:text-white" />
       </div>
     </div>
   );

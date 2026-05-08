@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Menu, X, Rocket } from 'lucide-react';
+import React, { useState } from "react";
+import { Menu, X, Rocket } from "lucide-react";
 import {
   SignInButton,
   SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
-} from '@clerk/nextjs';
-import Link from 'next/link';
+} from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,52 +21,55 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 w-full z-50 pt-6">
-      <div className="max-w-6xl mx-auto rounded-full bg-[#1d14536f] backdrop-blur-lg shadow-2xl">
-        <div className="relative flex items-center justify-between px-6 md:px-10 py-3 h-16 text-white">
-
+    <nav className="fixed top-0 z-50 w-full pt-6">
+      <div className="mx-auto max-w-6xl rounded-full bg-[#1d14536f] shadow-2xl backdrop-blur-lg">
+        <div className="relative flex h-16 items-center justify-between px-6 py-3 text-white md:px-10">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 text-white text-2xl font-extrabold tracking-wider z-20">
-            <Rocket className="text-[#906ae2] w-6 h-6" />
+          <Link
+            href="/"
+            className="z-20 flex items-center space-x-2 text-2xl font-extrabold tracking-wider text-white"
+          >
+            <Rocket className="h-6 w-6 text-[#906ae2]" />
             <span>PLAN.IN</span>
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex gap-10 text-sm font-semibold mx-auto">
+          <div className="mx-auto hidden gap-10 text-sm font-semibold md:flex">
             {navItems.map((item, idx) => (
-              <a key={idx} href={item.link} className="hover:text-[#6A2EEF] transition p-2">
+              <a
+                key={idx}
+                href={item.link}
+                className="p-2 transition hover:text-[#6A2EEF]"
+              >
                 {item.name}
               </a>
             ))}
           </div>
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex gap-4 z-20 items-center">
+          <div className="z-20 hidden items-center gap-4 md:flex">
             <SignedOut>
               <SignUpButton forceRedirectUrl="/dashboard">
-                <button className="px-5 py-2 font-semibold text-white/90 hover:bg-[#3E3466] rounded-full">
+                <button className="rounded-full px-5 py-2 font-semibold text-white/90 hover:bg-[#3E3466]">
                   Sign Up
                 </button>
               </SignUpButton>
 
               <SignInButton forceRedirectUrl="/dashboard">
-                <button className="px-6 py-2 bg-[#6A2EEF] hover:bg-[#7D45FF] rounded-full font-bold shadow-xl">
+                <button className="rounded-full bg-[#6A2EEF] px-6 py-2 font-bold shadow-xl hover:bg-[#7D45FF]">
                   Log In
                 </button>
               </SignInButton>
             </SignedOut>
 
             <SignedIn>
-
               <UserButton appearance={{ elements: { avatarBox: "w-10 h-10" } }}>
                 <UserButton.MenuItems>
-
                   <UserButton.Link
                     label="Dashboard"
-                    labelIcon={<Rocket className="w-4 h-4" />}
+                    labelIcon={<Rocket className="h-4 w-4" />}
                     href="/dashboard"
                   />
-
                 </UserButton.MenuItems>
               </UserButton>
             </SignedIn>
@@ -75,7 +78,7 @@ export default function Navbar() {
           {/* Mobile Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 bg-[#2D2350] rounded-lg"
+            className="rounded-lg bg-[#2D2350] p-2 md:hidden"
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -84,14 +87,14 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#1A103B] w-full px-6 py-6 mt-2 rounded-b-2xl shadow-xl">
+        <div className="mt-2 w-full rounded-b-2xl bg-[#1A103B] px-6 py-6 shadow-xl md:hidden">
           <div className="flex flex-col gap-4">
             {navItems.map((item, idx) => (
               <a
                 key={idx}
                 href={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-[#2D2350] transition"
+                className="w-full rounded-lg px-4 py-3 text-lg font-medium text-white transition hover:bg-[#2D2350]"
               >
                 {item.name}
               </a>
@@ -99,13 +102,13 @@ export default function Navbar() {
 
             <SignedOut>
               <SignUpButton forceRedirectUrl="/dashboard">
-                <button className="w-full py-3 rounded-lg bg-[#3E3466] font-semibold text-white">
+                <button className="w-full rounded-lg bg-[#3E3466] py-3 font-semibold text-white">
                   Sign Up
                 </button>
               </SignUpButton>
 
               <SignInButton forceRedirectUrl="/dashboard">
-                <button className="w-full py-3 rounded-lg bg-[#6A2EEF] font-bold text-white shadow-md">
+                <button className="w-full rounded-lg bg-[#6A2EEF] py-3 font-bold text-white shadow-md">
                   Log In
                 </button>
               </SignInButton>
@@ -115,7 +118,7 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full text-center py-3 rounded-lg bg-[#3E3466] font-semibold text-white"
+                className="w-full rounded-lg bg-[#3E3466] py-3 text-center font-semibold text-white"
               >
                 Dashboard
               </Link>
@@ -123,7 +126,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
     </nav>
   );
 }

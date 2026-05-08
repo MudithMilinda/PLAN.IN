@@ -1,7 +1,7 @@
-import { CalendarEvent } from '@/types/calendar';
-import type { MouseEvent } from 'react';
-import { isToday, sameDay } from '@/utils/calendarHelpers';
-import { EventCard } from './EventCard';
+import { CalendarEvent } from "@/types/calendar";
+import type { MouseEvent } from "react";
+import { isToday, sameDay } from "@/utils/calendarHelpers";
+import { EventCard } from "./EventCard";
 
 interface DayCellProps {
   date: number;
@@ -38,22 +38,24 @@ export function DayCell({
     <div
       ref={dayRef}
       onClick={() => onDateClick(fullDate)}
-      className={`border-r border-b border-gray-200 p-2 min-h-32 cursor-pointer hover:bg-gray-50 transition-colors
-        ${selected ? 'bg-indigo-50 border-2 border-indigo-400' : 'bg-white'}
-        ${!isCurrentMonth ? 'text-gray-400' : 'text-gray-900'}`}
+      className={`min-h-32 cursor-pointer border-r border-b border-gray-200 p-2 transition-colors hover:bg-gray-50 ${selected ? "border-2 border-indigo-400 bg-indigo-50" : "bg-white"} ${!isCurrentMonth ? "text-gray-400" : "text-gray-900"}`}
     >
       <div
-        className={`text-sm font-medium mb-1 ${
+        className={`mb-1 text-sm font-medium ${
           todayDate
-            ? 'bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto'
-            : ''
+            ? "mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white"
+            : ""
         }`}
       >
         {date}
       </div>
       <div className="space-y-1">
         {dayEvents.map((event) => (
-          <EventCard key={event.id} event={event} onClick={(ev, e) => handleEventClick(ev, e)} />
+          <EventCard
+            key={event.id}
+            event={event}
+            onClick={(ev, e) => handleEventClick(ev, e)}
+          />
         ))}
       </div>
     </div>

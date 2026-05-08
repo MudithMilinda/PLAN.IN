@@ -1,21 +1,23 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export default function StatsSection() {
   const stats = [
     { number: "10X", label: "Faster Event Promotion" },
     { number: "90%", label: "Better Audience Targeting" },
-    { number: "1,000+", label: "Marketing Plans Generated" }
+    { number: "1,000+", label: "Marketing Plans Generated" },
   ];
 
   return (
-    <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto px-8 py-40">
+    <div className="mx-auto grid max-w-6xl gap-12 px-8 py-40 md:grid-cols-3">
       {stats.map((stat, i) => (
         <div key={i} className="text-center text-white">
           <div
-            className="text-5xl font-bold mb-2 bg-clip-text text-transparent"
-            style={{ backgroundImage: 'linear-gradient(to right, #ffffff, #ffffff)' }}
+            className="mb-2 bg-clip-text text-5xl font-bold text-transparent"
+            style={{
+              backgroundImage: "linear-gradient(to right, #ffffff, #ffffff)",
+            }}
           >
             {stat.number}
           </div>

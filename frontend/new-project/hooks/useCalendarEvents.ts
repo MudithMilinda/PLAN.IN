@@ -1,18 +1,29 @@
-import { type MouseEvent, useCallback, useState } from 'react';
-import { createEvent, deleteEvent, fetchContentPosts, fetchEvents, updateEvent } from '@/services/calendarApi';
-import { BackendEvent, CalendarEvent, NewEventData, SyncMessage } from '@/types/calendar';
-import { getOverlapEvent, sameDay } from '@/utils/calendarHelpers';
+import { type MouseEvent, useCallback, useState } from "react";
+import {
+  createEvent,
+  deleteEvent,
+  fetchContentPosts,
+  fetchEvents,
+  updateEvent,
+} from "@/services/calendarApi";
+import {
+  BackendEvent,
+  CalendarEvent,
+  NewEventData,
+  SyncMessage,
+} from "@/types/calendar";
+import { getOverlapEvent, sameDay } from "@/utils/calendarHelpers";
 
 const EMPTY_EVENT: NewEventData = {
-  title: '',
-  startTime: '',
-  endTime: '',
+  title: "",
+  startTime: "",
+  endTime: "",
   allDay: false,
-  calendar: 'my-calendar',
-  participants: '',
-  location: '',
-  description: '',
-  category: '',
+  calendar: "my-calendar",
+  participants: "",
+  location: "",
+  description: "",
+  category: "",
 };
 
 export function useCalendarEvents(userId?: string | null) {
@@ -23,7 +34,9 @@ export function useCalendarEvents(userId?: string | null) {
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [savingEvent, setSavingEvent] = useState(false);
-  const [overlapWarning, setOverlapWarning] = useState<CalendarEvent | null>(null);
+  const [overlapWarning, setOverlapWarning] = useState<CalendarEvent | null>(
+    null,
+  );
   const [syncMessage, setSyncMessage] = useState<SyncMessage | null>(null);
 
   const refreshEvents = useCallback(async () => {
@@ -33,20 +46,25 @@ export function useCalendarEvents(userId?: string | null) {
     }
 
     try {
-      const [eventsPayload, postsPayload] = await Promise.all([fetchEvents(userId), fetchContentPosts(userId)]);
+      const [eventsPayload, postsPayload] = await Promise.all([
+        fetchEvents(userId),
+        fetchContentPosts(userId),
+      ]);
       if (eventsPayload.res.ok) {
-        const mainEvents: CalendarEvent[] = (eventsPayload.data.events || []).map((e) => ({
+        const mainEvents: CalendarEvent[] = (
+          eventsPayload.data.events || []
+        ).map((e) => ({
           id: e.id,
           title: e.event_name,
           date: new Date(e.event_date),
-          startTime: '09:00',
-          endTime: '10:00',
+          startTime: "09:00",
+          endTime: "10:00",
           allDay: true,
-          calendar: 'my-calendar',
-          participants: '',
-          location: e.location || '',
-          description: '',
-          category: e.event_theme || '',
+          calendar: "my-calendar",
+          participants: "",
+          location: e.location || "",
+          description: "",
+          category: e.event_theme || "",
           googleEventId: e.google_event_id,
           isContentPost: false,
         }));
@@ -57,14 +75,14 @@ export function useCalendarEvents(userId?: string | null) {
               rawPostId: post.id,
               title: `${post.event_name || post.platform} — ${post.post_type}`,
               date: new Date(post.post_date),
-              startTime: '09:00',
-              endTime: '09:30',
+              startTime: "09:00",
+              endTime: "09:30",
               allDay: true,
-              calendar: 'important',
-              participants: '',
-              location: post.week_label || '',
-              description: post.caption || post.content_description || '',
-              category: `Weekly Content • ${post.week_theme || ''}`,
+              calendar: "important",
+              participants: "",
+              location: post.week_label || "",
+              description: post.caption || post.content_description || "",
+              category: `Weekly Content • ${post.week_theme || ""}`,
               googleEventId: post.google_event_id,
               isContentPost: true,
               platform: post.platform,
@@ -80,13 +98,16 @@ export function useCalendarEvents(userId?: string | null) {
         setEvents([...mainEvents, ...contentPostEvents]);
       }
     } catch (err) {
-      console.error('Fetch events error:', err);
+      console.error("Fetch events error:", err);
     } finally {
       setLoadingEvents(false);
     }
   }, [userId]);
 
-  const saveEvent = async (selectedDate: Date | null, googleConnected: boolean) => {
+  const saveEvent = async (
+    selectedDate: Date | null,
+    googleConnected: boolean,
+  ) => {
     if (!userId || !newEvent.title || !selectedDate) return false;
 
     if (!newEvent.allDay) {
@@ -106,26 +127,29 @@ export function useCalendarEvents(userId?: string | null) {
         ? await updateEvent(userId, editingEventId, newEvent, selectedDate)
         : await createEvent(userId, newEvent, selectedDate);
 
-      if (!res.ok) throw new Error(data.error || 'Save failed');
+      if (!res.ok) throw new Error(data.error || "Save failed");
       await refreshEvents();
 
       if (googleConnected && data.googleEventId) {
         const posts = data.calendarPostsSynced ?? 0;
-        setSyncMessage({ type: 'success', text: `✓ Saved & synced to Google Calendar${posts > 0 ? ` + ${posts} content posts added` : ''}` });
+        setSyncMessage({
+          type: "success",
+          text: `✓ Saved & synced to Google Calendar${posts > 0 ? ` + ${posts} content posts added` : ""}`,
+        });
       } else if (isEdit && googleConnected) {
-        setSyncMessage({ type: 'success', text: '✓ Event updated' });
+        setSyncMessage({ type: "success", text: "✓ Event updated" });
       } else {
-        setSyncMessage({ type: 'success', text: '✓ Event saved' });
+        setSyncMessage({ type: "success", text: "✓ Event saved" });
       }
       setTimeout(() => setSyncMessage(null), 5000);
 
       setEditingEventId(null);
       setOverlapWarning(null);
-      setNewEvent({ ...EMPTY_EVENT, calendar: 'my-calendar' });
+      setNewEvent({ ...EMPTY_EVENT, calendar: "my-calendar" });
       return true;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setSyncMessage({ type: 'error', text: `Error: ${message}` });
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setSyncMessage({ type: "error", text: `Error: ${message}` });
       return false;
     } finally {
       setSavingEvent(false);
@@ -137,15 +161,22 @@ export function useCalendarEvents(userId?: string | null) {
     setDeletingId(eventId);
     try {
       const { res, data } = await deleteEvent(userId, eventId);
-      if (!res.ok) throw new Error(data.error || 'Delete failed');
-      setEvents((prev) => prev.filter((e) => e.id !== eventId && e.id !== `content-${eventId}`));
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      setEvents((prev) =>
+        prev.filter((e) => e.id !== eventId && e.id !== `content-${eventId}`),
+      );
       setBackendEvents((prev) => prev.filter((e) => e.id !== eventId));
-      setSyncMessage({ type: 'success', text: data.googleDeleted ? '🗑️ Deleted from app & Google Calendar' : '🗑️ Event deleted' });
+      setSyncMessage({
+        type: "success",
+        text: data.googleDeleted
+          ? "🗑️ Deleted from app & Google Calendar"
+          : "🗑️ Event deleted",
+      });
       setTimeout(() => setSyncMessage(null), 4000);
       setEditingEventId(null);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setSyncMessage({ type: 'error', text: `Delete failed: ${message}` });
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setSyncMessage({ type: "error", text: `Delete failed: ${message}` });
     } finally {
       setDeletingId(null);
     }
@@ -159,16 +190,17 @@ export function useCalendarEvents(userId?: string | null) {
       endTime: event.endTime,
       allDay: event.allDay,
       calendar: event.calendar,
-      participants: event.participants || '',
-      location: event.location || '',
-      description: event.description || '',
-      category: event.category || '',
+      participants: event.participants || "",
+      location: event.location || "",
+      description: event.description || "",
+      category: event.category || "",
     });
     setEditingEventId(event.id);
     setOverlapWarning(null);
   };
 
-  const getEventsForDate = (date: Date) => events.filter((e) => sameDay(new Date(e.date), date));
+  const getEventsForDate = (date: Date) =>
+    events.filter((e) => sameDay(new Date(e.date), date));
 
   return {
     events,

@@ -1,7 +1,7 @@
-import { CalendarDay, CalendarEvent } from '@/types/calendar';
-import type { MutableRefObject } from 'react';
-import { DAYS_OF_WEEK } from '@/utils/calendarHelpers';
-import { DayCell } from './DayCell';
+import { CalendarDay, CalendarEvent } from "@/types/calendar";
+import type { MutableRefObject } from "react";
+import { DAYS_OF_WEEK } from "@/utils/calendarHelpers";
+import { DayCell } from "./DayCell";
 
 interface CalendarGridProps {
   days: CalendarDay[];

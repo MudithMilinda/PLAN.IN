@@ -45,21 +45,24 @@ export default function ClientFeedback() {
   };
 
   return (
-    <div className="min-h-screen py-16 px-4" style={{ backgroundColor: "#050020" }}>
-      <div className="max-w-7xl mx-auto">
+    <div
+      className="min-h-screen px-4 py-16"
+      style={{ backgroundColor: "#050020" }}
+    >
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h3 className="text-blue-400 font-semibold text-lg mb-2">
+        <div className="mb-12 text-center">
+          <h3 className="mb-2 text-lg font-semibold text-blue-400">
             Client Feedback
           </h3>
-          <h1 className="text-4xl md:text-5xl font-bold text-white">
+          <h1 className="text-4xl font-bold text-white md:text-5xl">
             What They Say After Using Our Product
           </h1>
         </div>
 
         {/* Testimonials */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2"
           initial="hidden"
           animate="visible"
           variants={{
@@ -74,7 +77,7 @@ export default function ClientFeedback() {
             <motion.div
               key={idx}
               variants={cardVariants}
-              className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 hover:bg-white/10 transition duration-300 cursor-pointer"
+              className="cursor-pointer rounded-2xl bg-white/5 p-8 backdrop-blur-sm transition duration-300 hover:bg-white/10"
               style={{
                 borderColor: "rgba(244, 160, 255, 0.2)",
                 borderWidth: "1px",
@@ -92,11 +95,11 @@ export default function ClientFeedback() {
               }
             >
               {/* Stars */}
-              <div className="flex gap-1 mb-6">
+              <div className="mb-6 flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className="w-6 h-6 text-orange-400 fill-current"
+                    className="h-6 w-6 fill-current text-orange-400"
                     viewBox="0 0 24 24"
                   >
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -105,22 +108,22 @@ export default function ClientFeedback() {
               </div>
 
               {/* Avatar & Name */}
-              <div className="flex items-center gap-4 mb-6">
+              <div className="mb-6 flex items-center gap-4">
                 <div
-                  className={`w-14 h-14 ${testimonial.color} rounded-full flex items-center justify-center text-2xl`}
+                  className={`h-14 w-14 ${testimonial.color} flex items-center justify-center rounded-full text-2xl`}
                 >
                   {testimonial.avatar}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg">
+                  <h3 className="text-lg font-bold text-white">
                     {testimonial.name}
                   </h3>
-                  <p className="text-gray-300 text-sm">{testimonial.title}</p>
+                  <p className="text-sm text-gray-300">{testimonial.title}</p>
                 </div>
               </div>
 
               {/* Quote */}
-              <p className="text-gray-200 leading-relaxed">
+              <p className="leading-relaxed text-gray-200">
                 {testimonial.quote}
               </p>
             </motion.div>

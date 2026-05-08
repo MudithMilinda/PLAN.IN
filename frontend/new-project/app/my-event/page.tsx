@@ -4,7 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { SidebarDemo } from "@/components/layout/Sidebar";
-import { Calendar, MapPin, Users, Plus, ChevronRight, Sparkles, Trash2, X, AlertTriangle } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Plus,
+  ChevronRight,
+  Sparkles,
+  Trash2,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 
 interface Event {
   id: string;
@@ -21,7 +31,10 @@ function MyEventsContent() {
   const { user } = useUser();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState<{ open: boolean; event: Event | null }>({
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    event: Event | null;
+  }>({
     open: false,
     event: null,
   });
@@ -29,7 +42,10 @@ function MyEventsContent() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      if (!user?.id) { setLoading(false); return; }
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
       try {
         const response = await fetch("http://localhost:5000/api/events", {
           method: "POST",
@@ -70,7 +86,7 @@ function MyEventsContent() {
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (response.ok) {
@@ -89,15 +105,17 @@ function MyEventsContent() {
 
   return (
     <div
-      className="min-h-screen p-4 md:p-6 mt-7"
+      className="mt-7 min-h-screen p-4 md:p-6"
       style={{ background: "linear-gradient(to bottom, #050020, #050020)" }}
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">My Events</h1>
-            <p className="text-gray-400 text-sm md:text-base">
+            <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">
+              My Events
+            </h1>
+            <p className="text-sm text-gray-400 md:text-base">
               {events.length > 0
                 ? `${events.length} event${events.length > 1 ? "s" : ""} — click to view marketing plan`
                 : "Manage all your events in one place"}
@@ -107,8 +125,8 @@ function MyEventsContent() {
 
         {/* Events List */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center gap-4 py-20">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
             <p className="text-gray-400">Loading your events...</p>
           </div>
         ) : events.length > 0 ? (
@@ -124,15 +142,19 @@ function MyEventsContent() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-12 text-center max-w-md">
-              <Calendar className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">No events yet</h3>
-              <p className="text-gray-400 mb-6">Get started by creating your first event</p>
+            <div className="max-w-md rounded-2xl border border-slate-700/50 bg-slate-800/30 p-12 text-center backdrop-blur-sm">
+              <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-500" />
+              <h3 className="mb-2 text-xl font-bold text-white">
+                No events yet
+              </h3>
+              <p className="mb-6 text-gray-400">
+                Get started by creating your first event
+              </p>
               <button
                 onClick={() => router.push("/events/create")}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 mx-auto"
+                className="mx-auto flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white"
               >
-                <Plus className="w-4 h-4" /> Create Event
+                <Plus className="h-4 w-4" /> Create Event
               </button>
             </div>
           </div>
@@ -149,30 +171,34 @@ function MyEventsContent() {
           />
 
           {/* Modal */}
-          <div className="relative bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-800 p-6 shadow-2xl">
             {/* Close button */}
             <button
               onClick={closeDeleteModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+              className="absolute top-4 right-4 text-gray-500 transition-colors hover:text-white"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
 
             {/* Icon */}
-            <div className="w-12 h-12 bg-red-500/15 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-red-500/30 bg-red-500/15">
+              <AlertTriangle className="h-6 w-6 text-red-400" />
             </div>
 
             {/* Text */}
-            <h3 className="text-white font-bold text-xl text-center mb-2">Delete Event?</h3>
-            <p className="text-gray-400 text-sm text-center mb-1">
+            <h3 className="mb-2 text-center text-xl font-bold text-white">
+              Delete Event?
+            </h3>
+            <p className="mb-1 text-center text-sm text-gray-400">
               You are about to delete
             </p>
-            <p className="text-white font-semibold text-center mb-4">
+            <p className="mb-4 text-center font-semibold text-white">
               &quot;{deleteModal.event.event_name}&quot;
             </p>
-            <p className="text-gray-500 text-xs text-center mb-6">
-              This will permanently delete the event, all content posts, and remove everything from Google Calendar. This action cannot be undone.
+            <p className="mb-6 text-center text-xs text-gray-500">
+              This will permanently delete the event, all content posts, and
+              remove everything from Google Calendar. This action cannot be
+              undone.
             </p>
 
             {/* Buttons */}
@@ -180,23 +206,23 @@ function MyEventsContent() {
               <button
                 onClick={closeDeleteModal}
                 disabled={deleting}
-                className="flex-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all"
+                className="flex-1 rounded-xl bg-slate-700 py-3 font-semibold text-white transition-all hover:bg-slate-600 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 font-semibold text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Deleting...
                   </>
                 ) : (
                   <>
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4" />
                     Delete
                   </>
                 )}
@@ -224,50 +250,55 @@ function EventCard({
   return (
     <div
       onClick={onClick}
-      className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-5 md:p-6 hover:bg-slate-800/60 hover:border-purple-500/30 transition-all cursor-pointer group"
+      className="group cursor-pointer rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 backdrop-blur-sm transition-all hover:border-purple-500/30 hover:bg-slate-800/60 md:p-6"
     >
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Left Side */}
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
+          <div className="mb-1 flex items-center gap-3">
+            <h3 className="text-xl font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text group-hover:text-transparent md:text-2xl">
               {event.event_name}
             </h3>
             {hasPlan && (
-              <span className="flex items-center gap-1 bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-medium px-2 py-0.5 rounded-full">
-                <Sparkles className="w-3 h-3" />
+              <span className="flex items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/15 px-2 py-0.5 text-xs font-medium text-purple-300">
+                <Sparkles className="h-3 w-3" />
                 Plan Ready
               </span>
             )}
           </div>
-          <p className="text-gray-400 text-sm">
-            Audience: <span className="text-white font-semibold">{event.target_audience}</span>
+          <p className="text-sm text-gray-400">
+            Audience:{" "}
+            <span className="font-semibold text-white">
+              {event.target_audience}
+            </span>
           </p>
         </div>
 
         {/* Right Side */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:items-center">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
           <div className="flex items-center gap-2 text-gray-300">
-            <div className="p-2 bg-slate-700/50 rounded-lg">
-              <Calendar className="w-4 h-4" />
+            <div className="rounded-lg bg-slate-700/50 p-2">
+              <Calendar className="h-4 w-4" />
             </div>
             <span className="text-sm">
               {new Date(event.event_date).toLocaleDateString("en-GB", {
-                day: "2-digit", month: "short", year: "numeric",
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
               })}
             </span>
           </div>
 
           <div className="flex items-center gap-2 text-gray-300">
-            <div className="p-2 bg-slate-700/50 rounded-lg">
-              <MapPin className="w-4 h-4" />
+            <div className="rounded-lg bg-slate-700/50 p-2">
+              <MapPin className="h-4 w-4" />
             </div>
             <span className="text-sm">{event.location}</span>
           </div>
 
           <div className="flex items-center gap-2 text-gray-300">
-            <div className="p-2 bg-slate-700/50 rounded-lg">
-              <Users className="w-4 h-4" />
+            <div className="rounded-lg bg-slate-700/50 p-2">
+              <Users className="h-4 w-4" />
             </div>
             <span className="text-sm">{event.event_theme}</span>
           </div>
@@ -276,14 +307,14 @@ function EventCard({
             {/* Delete Button */}
             <button
               onClick={onDelete}
-              className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+              className="rounded-lg p-2 text-gray-500 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500/10 hover:text-red-400"
               title="Delete event"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
             </button>
 
             {/* Arrow */}
-            <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-purple-400 transition-colors hidden md:block" />
+            <ChevronRight className="hidden h-5 w-5 text-gray-600 transition-colors group-hover:text-purple-400 md:block" />
           </div>
         </div>
       </div>

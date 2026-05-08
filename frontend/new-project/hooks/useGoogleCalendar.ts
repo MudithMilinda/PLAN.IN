@@ -1,6 +1,10 @@
-import { useCallback, useState } from 'react';
-import { disconnectGoogle, getGoogleConnectUrl, getGoogleStatus } from '@/services/calendarApi';
-import { SyncMessage } from '@/types/calendar';
+import { useCallback, useState } from "react";
+import {
+  disconnectGoogle,
+  getGoogleConnectUrl,
+  getGoogleStatus,
+} from "@/services/calendarApi";
+import { SyncMessage } from "@/types/calendar";
 
 export function useGoogleCalendar(userId?: string | null) {
   const [googleConnected, setGoogleConnected] = useState(false);
@@ -22,15 +26,20 @@ export function useGoogleCalendar(userId?: string | null) {
     window.location.href = getGoogleConnectUrl(userId);
   };
 
-  const handleGoogleDisconnect = async (setSyncMessage: (message: SyncMessage | null) => void) => {
+  const handleGoogleDisconnect = async (
+    setSyncMessage: (message: SyncMessage | null) => void,
+  ) => {
     if (!userId) return;
     try {
       await disconnectGoogle(userId);
       setGoogleConnected(false);
-      setSyncMessage({ type: 'success', text: 'Google Calendar disconnected.' });
+      setSyncMessage({
+        type: "success",
+        text: "Google Calendar disconnected.",
+      });
       setTimeout(() => setSyncMessage(null), 3000);
     } catch {
-      setSyncMessage({ type: 'error', text: 'Failed to disconnect.' });
+      setSyncMessage({ type: "error", text: "Failed to disconnect." });
     }
   };
 

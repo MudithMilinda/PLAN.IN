@@ -69,7 +69,7 @@ export interface ContentPostEdit {
 }
 
 export interface SyncMessage {
-  type: 'success' | 'error';
+  type: "success" | "error";
   text: string;
 }
 

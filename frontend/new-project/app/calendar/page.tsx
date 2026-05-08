@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
-import { SidebarDemo } from '@/components/layout/Sidebar';
-import { CalendarGrid } from '@/components/calendar/CalendarGrid';
-import { CalendarHeader } from '@/components/calendar/CalendarHeader';
-import { CalendarSidebar } from '@/components/calendar/CalendarSidebar';
-import { EventPopup } from '@/components/calendar/EventPopup';
-import { useCalendarEvents } from '@/hooks/useCalendarEvents';
-import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
-import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
-import type { CalendarEvent } from '@/types/calendar';
-import { getDaysInMonth } from '@/utils/calendarHelpers';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { SidebarDemo } from "@/components/layout/Sidebar";
+import { CalendarGrid } from "@/components/calendar/CalendarGrid";
+import { CalendarHeader } from "@/components/calendar/CalendarHeader";
+import { CalendarSidebar } from "@/components/calendar/CalendarSidebar";
+import { EventPopup } from "@/components/calendar/EventPopup";
+import { useCalendarEvents } from "@/hooks/useCalendarEvents";
+import { useCalendarNavigation } from "@/hooks/useCalendarNavigation";
+import { useGoogleCalendar } from "@/hooks/useGoogleCalendar";
+import type { CalendarEvent } from "@/types/calendar";
+import { getDaysInMonth } from "@/utils/calendarHelpers";
 
 export default function CalendarPage() {
   const { user } = useUser();
@@ -21,7 +21,16 @@ export default function CalendarPage() {
   const [popupEvent, setPopupEvent] = useState<CalendarEvent | null>(null);
   const [popupRect, setPopupRect] = useState<DOMRect | null>(null);
 
-  const { currentDate, selectedDate, setCurrentDate, setSelectedDate, prevMonth, nextMonth, goToday, selectDate } = useCalendarNavigation();
+  const {
+    currentDate,
+    selectedDate,
+    setCurrentDate,
+    setSelectedDate,
+    prevMonth,
+    nextMonth,
+    goToday,
+    selectDate,
+  } = useCalendarNavigation();
   const {
     backendEvents,
     loadingEvents,
@@ -33,20 +42,32 @@ export default function CalendarPage() {
     getEventsForDate,
   } = useCalendarEvents(user?.id);
 
-  const { googleConnected, googleLoading, checkGoogleStatus, handleGoogleConnect, handleGoogleDisconnect } = useGoogleCalendar(user?.id);
+  const {
+    googleConnected,
+    googleLoading,
+    checkGoogleStatus,
+    handleGoogleConnect,
+    handleGoogleDisconnect,
+  } = useGoogleCalendar(user?.id);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const connected = params.get('google_connected');
+    const connected = params.get("google_connected");
 
-    if (connected === 'true') {
-      setSyncMessage({ type: 'success', text: '✅ Google Calendar connected!' });
+    if (connected === "true") {
+      setSyncMessage({
+        type: "success",
+        text: "✅ Google Calendar connected!",
+      });
       setTimeout(() => setSyncMessage(null), 4000);
-      window.history.replaceState({}, '', '/calendar');
-    } else if (connected === 'false') {
-      setSyncMessage({ type: 'error', text: 'Google Calendar connection failed. Try again.' });
+      window.history.replaceState({}, "", "/calendar");
+    } else if (connected === "false") {
+      setSyncMessage({
+        type: "error",
+        text: "Google Calendar connection failed. Try again.",
+      });
       setTimeout(() => setSyncMessage(null), 5000);
-      window.history.replaceState({}, '', '/calendar');
+      window.history.replaceState({}, "", "/calendar");
     }
 
     checkGoogleStatus();

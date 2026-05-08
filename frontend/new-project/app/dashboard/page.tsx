@@ -81,34 +81,43 @@ function DashboardContent({
         eventDate.setHours(0, 0, 0, 0);
         return eventDate >= today;
       })
-      .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.event_date).getTime() - new Date(b.event_date).getTime(),
+      );
   }, [events]);
 
   const shownEvents = useMemo(() => ongoingEvents.slice(0, 6), [ongoingEvents]);
 
   return (
-    <div className="min-h-screen p-4 md:p-6 mt-7" style={{ background: "#050020" }}>
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="grid grid-cols-1 xl:grid-cols-[1.9fr_0.9fr] gap-6 items-stretch">
-          <section className="rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] backdrop-blur-md p-5 md:p-7 shadow-[0_20px_80px_rgba(8,8,40,0.55)] h-full">
-            <div className="flex flex-col md:flex-row md:items-center gap-6 h-full">
+    <div
+      className="mt-7 min-h-screen p-4 md:p-6"
+      style={{ background: "#050020" }}
+    >
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-[1.9fr_0.9fr]">
+          <section className="h-full rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] p-5 shadow-[0_20px_80px_rgba(8,8,40,0.55)] backdrop-blur-md md:p-7">
+            <div className="flex h-full flex-col gap-6 md:flex-row md:items-center">
               <div className="flex justify-center md:justify-start">
-              <img
-                src={user?.imageUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"}
-                alt="User profile picture"
-                className="h-28 w-28 md:h-32 md:w-32 rounded-full object-cover border-4 border-[#7f66d6]"
-              />
+                <img
+                  src={
+                    user?.imageUrl ||
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
+                  }
+                  alt="User profile picture"
+                  className="h-28 w-28 rounded-full border-4 border-[#7f66d6] object-cover md:h-32 md:w-32"
+                />
               </div>
 
               <div className="flex-1">
                 <div className="flex items-center justify-between gap-3">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  <h1 className="text-2xl font-bold text-white md:text-3xl">
                     {profile.fullName || user?.fullName || "PLAN.IN Creator"}
                   </h1>
                   {!isEditing ? (
                     <button
                       onClick={onStartEdit}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[#2d2066] px-3 py-2 text-sm text-[#d8cbff] hover:bg-[#5138a3] transition-colors"
+                      className="inline-flex items-center gap-2 rounded-lg bg-[#2d2066] px-3 py-2 text-sm text-[#d8cbff] transition-colors hover:bg-[#5138a3]"
                     >
                       <Pencil className="h-4 w-4" /> Edit
                     </button>
@@ -116,7 +125,7 @@ function DashboardContent({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={onCancelEdit}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[#2f274d] px-3 py-2 text-sm text-gray-200 hover:bg-[#3d3360] transition-colors"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#2f274d] px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-[#3d3360]"
                       >
                         <X className="h-4 w-4" /> Cancel
                       </button>
@@ -125,41 +134,96 @@ function DashboardContent({
                         disabled={isSaving}
                         className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm text-white hover:bg-purple-700 disabled:opacity-60"
                       >
-                        <Save className="h-4 w-4" /> {isSaving ? "Saving..." : "Save"}
+                        <Save className="h-4 w-4" />{" "}
+                        {isSaving ? "Saving..." : "Save"}
                       </button>
                     </div>
                   )}
                 </div>
 
                 {!isEditing ? (
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <p className="text-gray-300 flex items-center gap-2">
+                  <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                    <p className="flex items-center gap-2 text-gray-300">
                       <Mail className="h-4 w-4 text-[#b79cf8]" />
-                      {profile.email || user?.primaryEmailAddress?.emailAddress || "yourmail@example.com"}
+                      {profile.email ||
+                        user?.primaryEmailAddress?.emailAddress ||
+                        "yourmail@example.com"}
                     </p>
-                    <p className="text-gray-300 flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-gray-300">
                       <Phone className="h-4 w-4 text-[#b79cf8]" />
                       {profile.phone || "+94 77 000 0000"}
                     </p>
-                    <p className="text-gray-300 flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-gray-300">
                       <MapPin className="h-4 w-4 text-[#b79cf8]" />
                       {profile.location || "Colombo, Sri Lanka"}
                     </p>
-                    <p className="text-gray-300 flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-gray-300">
                       <CalendarDays className="h-4 w-4 text-[#b79cf8]" />
                       Active events: {events.length}
                     </p>
                   </div>
                 ) : (
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Full name" value={profileForm.fullName} onChange={(e) => onChangeProfile("fullName", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Email" value={profileForm.email} onChange={(e) => onChangeProfile("email", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Phone" value={profileForm.phone} onChange={(e) => onChangeProfile("phone", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Location" value={profileForm.location} onChange={(e) => onChangeProfile("location", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Instagram URL" value={profileForm.instagramUrl} onChange={(e) => onChangeProfile("instagramUrl", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Facebook URL" value={profileForm.facebookUrl} onChange={(e) => onChangeProfile("facebookUrl", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Twitter URL" value={profileForm.twitterUrl} onChange={(e) => onChangeProfile("twitterUrl", e.target.value)} />
-                    <input className="rounded-lg bg-[#1e1452] border border-[#4a3b85] px-3 py-2 text-white outline-none" placeholder="Telegram URL" value={profileForm.telegramUrl} onChange={(e) => onChangeProfile("telegramUrl", e.target.value)} />
+                  <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Full name"
+                      value={profileForm.fullName}
+                      onChange={(e) =>
+                        onChangeProfile("fullName", e.target.value)
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Email"
+                      value={profileForm.email}
+                      onChange={(e) => onChangeProfile("email", e.target.value)}
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Phone"
+                      value={profileForm.phone}
+                      onChange={(e) => onChangeProfile("phone", e.target.value)}
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Location"
+                      value={profileForm.location}
+                      onChange={(e) =>
+                        onChangeProfile("location", e.target.value)
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Instagram URL"
+                      value={profileForm.instagramUrl}
+                      onChange={(e) =>
+                        onChangeProfile("instagramUrl", e.target.value)
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Facebook URL"
+                      value={profileForm.facebookUrl}
+                      onChange={(e) =>
+                        onChangeProfile("facebookUrl", e.target.value)
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Twitter URL"
+                      value={profileForm.twitterUrl}
+                      onChange={(e) =>
+                        onChangeProfile("twitterUrl", e.target.value)
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-[#4a3b85] bg-[#1e1452] px-3 py-2 text-white outline-none"
+                      placeholder="Telegram URL"
+                      value={profileForm.telegramUrl}
+                      onChange={(e) =>
+                        onChangeProfile("telegramUrl", e.target.value)
+                      }
+                    />
                   </div>
                 )}
 
@@ -170,7 +234,7 @@ function DashboardContent({
                       href={item.href || "#"}
                       target="_blank"
                       rel="noreferrer"
-                      className="h-9 w-9 rounded-full bg-[#2d2066] text-[#d8cbff] hover:bg-[#5138a3] transition-colors flex items-center justify-center"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2d2066] text-[#d8cbff] transition-colors hover:bg-[#5138a3]"
                     >
                       <item.icon className="h-4 w-4" />
                     </a>
@@ -181,64 +245,82 @@ function DashboardContent({
           </section>
 
           <section className="grid grid-rows-2 gap-4">
-            <div className="rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 min-h-[170px] shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
+            <div className="min-h-[170px] rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
               <div className="flex items-center justify-between">
-                <div className="h-9 w-9 rounded-full bg-[#6f5bd6]/25 text-[#cdbdff] flex items-center justify-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#6f5bd6]/25 text-[#cdbdff]">
                   <TrendingUp className="h-4 w-4" />
                 </div>
               </div>
-              <p className="mt-3 text-sm text-[#d8d8ea] font-semibold">Total Events</p>
+              <p className="mt-3 text-sm font-semibold text-[#d8d8ea]">
+                Total Events
+              </p>
               <div className="mt-2 flex items-center gap-2">
                 <p className="text-3xl font-bold text-white">{events.length}</p>
-                <span className="rounded-full bg-[#2a2a5a] px-2 py-1 text-[11px] text-[#bda9ff]">+{Math.max(events.length, 1)}%</span>
+                <span className="rounded-full bg-[#2a2a5a] px-2 py-1 text-[11px] text-[#bda9ff]">
+                  +{Math.max(events.length, 1)}%
+                </span>
               </div>
-              <p className="mt-3 text-xs text-[#9da0bf]">Overall events created in your workspace.</p>
+              <p className="mt-3 text-xs text-[#9da0bf]">
+                Overall events created in your workspace.
+              </p>
             </div>
-            <div className="rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 min-h-[170px] shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
+            <div className="min-h-[170px] rounded-2xl border border-[#2a2a5a] bg-[#0C0C29] p-5 shadow-[0_12px_35px_rgba(8,8,40,0.45)]">
               <div className="flex items-center justify-between">
-                <div className="h-9 w-9 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                   <Activity className="h-4 w-4" />
                 </div>
               </div>
-              <p className="mt-3 text-sm text-[#d8d8ea] font-semibold">Ongoing Events</p>
+              <p className="mt-3 text-sm font-semibold text-[#d8d8ea]">
+                Ongoing Events
+              </p>
               <div className="mt-2 flex items-center gap-2">
-                <p className="text-3xl font-bold text-white">{ongoingEvents.length}</p>
-                <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] text-emerald-300">Live</span>
+                <p className="text-3xl font-bold text-white">
+                  {ongoingEvents.length}
+                </p>
+                <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-[11px] text-emerald-300">
+                  Live
+                </span>
               </div>
-              <p className="mt-3 text-xs text-[#9da0bf]">Events not passed yet, active from today onward.</p>
+              <p className="mt-3 text-xs text-[#9da0bf]">
+                Events not passed yet, active from today onward.
+              </p>
             </div>
           </section>
         </div>
 
         <section className="rounded-3xl border border-[#2a2a5a] bg-[#0C0C29] p-5 md:p-7">
-          <div className="flex items-center justify-between gap-4 mb-5">
-            <h2 className="text-xl md:text-2xl font-bold text-white">Ongoing Events</h2>
-            <span className="text-xs md:text-sm text-[#bda9ff] bg-[#2d2066] px-3 py-1 rounded-full">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold text-white md:text-2xl">
+              Ongoing Events
+            </h2>
+            <span className="rounded-full bg-[#2d2066] px-3 py-1 text-xs text-[#bda9ff] md:text-sm">
               {ongoingEvents.length} total
             </span>
           </div>
 
           {shownEvents.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {shownEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="rounded-2xl border border-[#3b2f6f] bg-[#130c42] p-4 hover:border-[#7c5de1] transition-colors"
+                  className="rounded-2xl border border-[#3b2f6f] bg-[#130c42] p-4 transition-colors hover:border-[#7c5de1]"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-white font-semibold text-base leading-snug">{event.event_name}</h3>
+                    <h3 className="text-base leading-snug font-semibold text-white">
+                      {event.event_name}
+                    </h3>
                     <button
                       onClick={() => onOpenEvent(event.id)}
-                      className="text-pink-300 bg-pink-500/20 rounded-full px-3 py-1 text-xs"
+                      className="rounded-full bg-pink-500/20 px-3 py-1 text-xs text-pink-300"
                     >
                       View
                     </button>
                   </div>
-                  <p className="mt-2 text-sm text-gray-300 flex items-center gap-1">
+                  <p className="mt-2 flex items-center gap-1 text-sm text-gray-300">
                     <MapPin className="h-4 w-4 text-[#b79cf8]" />
                     {event.location || "Location TBD"}
                   </p>
-                  <p className="mt-2 text-sm text-gray-300 flex items-center gap-1">
+                  <p className="mt-2 flex items-center gap-1 text-sm text-gray-300">
                     <CalendarDays className="h-4 w-4 text-[#b79cf8]" />
                     {new Date(event.event_date).toLocaleDateString("en-GB", {
                       day: "2-digit",
@@ -248,7 +330,7 @@ function DashboardContent({
                   </p>
                   <button
                     onClick={() => onOpenEvent(event.id)}
-                    className="mt-4 text-xs text-[#d5c6ff] flex items-center gap-1 hover:text-white transition-colors"
+                    className="mt-4 flex items-center gap-1 text-xs text-[#d5c6ff] transition-colors hover:text-white"
                   >
                     Open details <ExternalLink className="h-3.5 w-3.5" />
                   </button>
@@ -257,7 +339,9 @@ function DashboardContent({
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-[#4a3b85] p-10 text-center">
-              <p className="text-gray-300">No events yet. Create one from Generate Plan.</p>
+              <p className="text-gray-300">
+                No events yet. Create one from Generate Plan.
+              </p>
             </div>
           )}
         </section>
@@ -353,7 +437,10 @@ export default function DashboardPage() {
         if (response.ok && data.profile) {
           const loaded: ProfileForm = {
             fullName: data.profile.full_name || user.fullName || "",
-            email: data.profile.email || user.primaryEmailAddress?.emailAddress || "",
+            email:
+              data.profile.email ||
+              user.primaryEmailAddress?.emailAddress ||
+              "",
             phone: data.profile.phone || "",
             location: data.profile.location || "",
             instagramUrl: data.profile.instagram_url || "",

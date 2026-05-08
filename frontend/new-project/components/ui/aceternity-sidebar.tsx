@@ -9,18 +9,23 @@ interface SidebarProps {
   className?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen, children, className }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  open,
+  setOpen,
+  children,
+  className,
+}) => {
   return (
     <div
       className={cn(
-        "relative h-full bg-neutral-900 dark:bg-neutral-950 transition-all duration-300 z-40 flex flex-col shrink-0",
+        "relative z-40 flex h-full shrink-0 flex-col bg-neutral-900 transition-all duration-300 dark:bg-neutral-950",
         open ? "w-64" : "w-20",
-        className
+        className,
       )}
     >
       <button
         onClick={() => setOpen(!open)}
-        className="absolute -right-4 top-10 z-50 bg-neutral-800 p-1.5 rounded-full"
+        className="absolute top-10 -right-4 z-50 rounded-full bg-neutral-800 p-1.5"
       >
         {open ? "←" : "→"}
       </button>
@@ -34,11 +39,12 @@ interface SidebarBodyProps {
   children: ReactNode;
 }
 
-export const SidebarBody: React.FC<SidebarBodyProps> = ({ className, children }) => {
+export const SidebarBody: React.FC<SidebarBodyProps> = ({
+  className,
+  children,
+}) => {
   return (
-    <div className={cn("flex flex-col h-full p-4", className)}>
-      {children}
-    </div>
+    <div className={cn("flex h-full flex-col p-4", className)}>{children}</div>
   );
 };
 
@@ -51,13 +57,16 @@ interface SidebarLinkProps {
   className?: string;
 }
 
-export const SidebarLink: React.FC<SidebarLinkProps> = ({ link, className }) => {
+export const SidebarLink: React.FC<SidebarLinkProps> = ({
+  link,
+  className,
+}) => {
   return (
     <Link
       href={link.href}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-800 transition-colors text-neutral-300 hover:text-white",
-        className
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-neutral-300 transition-colors hover:bg-neutral-800 hover:text-white",
+        className,
       )}
     >
       <div className="flex-shrink-0">{link.icon}</div>

@@ -1,8 +1,16 @@
-import { Calendar, Loader2, MapPin, Trash2, Users, Wifi, WifiOff } from 'lucide-react';
-import type { MutableRefObject } from 'react';
-import { BackendEvent, SyncMessage } from '@/types/calendar';
-import { toNoon } from '@/utils/calendarHelpers';
-import { MiniCalendar } from './MiniCalendar';
+import {
+  Calendar,
+  Loader2,
+  MapPin,
+  Trash2,
+  Users,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
+import type { MutableRefObject } from "react";
+import { BackendEvent, SyncMessage } from "@/types/calendar";
+import { toNoon } from "@/utils/calendarHelpers";
+import { MiniCalendar } from "./MiniCalendar";
 
 interface CalendarSidebarProps {
   syncMessage: SyncMessage | null;
@@ -44,8 +52,14 @@ export function CalendarSidebar({
   return (
     <div className="flex w-64 flex-col gap-3 bg-indigo-950 p-4">
       {syncMessage && (
-        <div className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-medium ${syncMessage.type === 'success' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`}>
-          {syncMessage.type === 'success' ? <Wifi className="mt-0.5 h-3 w-3 shrink-0" /> : <WifiOff className="mt-0.5 h-3 w-3 shrink-0" />}
+        <div
+          className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-medium ${syncMessage.type === "success" ? "bg-green-800 text-green-100" : "bg-red-800 text-red-100"}`}
+        >
+          {syncMessage.type === "success" ? (
+            <Wifi className="mt-0.5 h-3 w-3 shrink-0" />
+          ) : (
+            <WifiOff className="mt-0.5 h-3 w-3 shrink-0" />
+          )}
           {syncMessage.text}
         </div>
       )}
@@ -57,51 +71,110 @@ export function CalendarSidebar({
               <Calendar className="h-3.5 w-3.5" />
               Google Calendar connected
             </div>
-            <button onClick={onGoogleDisconnect} className="flex items-center gap-2 rounded-xl border border-red-600/40 bg-red-800/40 px-3 py-2 text-xs font-medium text-red-300 transition hover:bg-red-700/40">
+            <button
+              onClick={onGoogleDisconnect}
+              className="flex items-center gap-2 rounded-xl border border-red-600/40 bg-red-800/40 px-3 py-2 text-xs font-medium text-red-300 transition hover:bg-red-700/40"
+            >
               Disconnect
             </button>
           </>
         ) : (
-          <button onClick={onGoogleConnect} disabled={googleLoading} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-medium text-gray-800 shadow-sm transition-all hover:bg-gray-100 disabled:opacity-60">
-            {googleLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Calendar className="h-3.5 w-3.5 text-blue-600" />}
+          <button
+            onClick={onGoogleConnect}
+            disabled={googleLoading}
+            className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-medium text-gray-800 shadow-sm transition-all hover:bg-gray-100 disabled:opacity-60"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Calendar className="h-3.5 w-3.5 text-blue-600" />
+            )}
             Connect Google Calendar
           </button>
         )}
       </div>
 
-      <MiniCalendar currentDate={currentDate} miniDays={miniDays} onPrevMonth={onPrevMonth} onNextMonth={onNextMonth} onDateClick={onDateClick} />
+      <MiniCalendar
+        currentDate={currentDate}
+        miniDays={miniDays}
+        onPrevMonth={onPrevMonth}
+        onNextMonth={onNextMonth}
+        onDateClick={onDateClick}
+      />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mb-2 text-xs font-semibold text-indigo-300">MY EVENTS 📅</div>
+        <div className="mb-2 text-xs font-semibold text-indigo-300">
+          MY EVENTS 📅
+        </div>
         {loadingEvents ? (
-          <div className="flex items-center gap-2 text-sm text-indigo-300"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</div>
+          <div className="flex items-center gap-2 text-sm text-indigo-300">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading...
+          </div>
         ) : backendEvents.length > 0 ? (
           <div className="space-y-2">
             {backendEvents.map((event) => (
-              <div key={event.id} className="group relative flex cursor-pointer flex-col gap-1 rounded-lg bg-indigo-900/40 px-3 py-2 transition hover:bg-indigo-800">
+              <div
+                key={event.id}
+                className="group relative flex cursor-pointer flex-col gap-1 rounded-lg bg-indigo-900/40 px-3 py-2 transition hover:bg-indigo-800"
+              >
                 <div
                   onClick={() => {
                     const d = toNoon(new Date(event.event_date));
                     onNavigateEventDate(d);
                     setTimeout(() => {
-                      dayRefs.current[d.toDateString()]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      dayRefs.current[d.toDateString()]?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
                     }, 100);
                   }}
                   className="flex items-start justify-between gap-1"
                 >
-                  <span className="text-sm font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text group-hover:text-transparent">{event.event_name}</span>
+                  <span className="text-sm font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text group-hover:text-transparent">
+                    {event.event_name}
+                  </span>
                   <div className="flex shrink-0 items-center gap-1">
                     {event.google_event_id && (
-                      <span title="Synced to Google Calendar"><Calendar className="h-3 w-3 text-green-400" /></span>
+                      <span title="Synced to Google Calendar">
+                        <Calendar className="h-3 w-3 text-green-400" />
+                      </span>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); onDeleteEvent(event.id); }} disabled={deletingId === event.id} title="Delete event" className="rounded p-0.5 opacity-0 transition-all hover:bg-red-600/40 group-hover:opacity-100">
-                      {deletingId === event.id ? <Loader2 className="h-3 w-3 animate-spin text-red-400" /> : <Trash2 className="h-3 w-3 text-red-400" />}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteEvent(event.id);
+                      }}
+                      disabled={deletingId === event.id}
+                      title="Delete event"
+                      className="rounded p-0.5 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-600/40"
+                    >
+                      {deletingId === event.id ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-red-400" />
+                      ) : (
+                        <Trash2 className="h-3 w-3 text-red-400" />
+                      )}
                     </button>
                   </div>
                 </div>
-                <span className="text-xs text-indigo-300">{new Date(event.event_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                {event.location && <span className="flex items-center gap-1 text-xs text-indigo-400"><MapPin className="h-3 w-3" />{event.location}</span>}
-                {event.event_theme && <span className="flex items-center gap-1 text-xs text-indigo-400"><Users className="h-3 w-3" />{event.event_theme}</span>}
+                <span className="text-xs text-indigo-300">
+                  {new Date(event.event_date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+                {event.location && (
+                  <span className="flex items-center gap-1 text-xs text-indigo-400">
+                    <MapPin className="h-3 w-3" />
+                    {event.location}
+                  </span>
+                )}
+                {event.event_theme && (
+                  <span className="flex items-center gap-1 text-xs text-indigo-400">
+                    <Users className="h-3 w-3" />
+                    {event.event_theme}
+                  </span>
+                )}
               </div>
             ))}
           </div>

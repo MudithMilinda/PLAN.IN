@@ -1,6 +1,20 @@
-import { AlignLeft, Calendar, Hash, MapPin, Mic, Palette, Phone, Pin, Smartphone, Tag, Trash2, Users, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { CalendarEvent } from '@/types/calendar';
+import {
+  AlignLeft,
+  Calendar,
+  Hash,
+  MapPin,
+  Mic,
+  Palette,
+  Phone,
+  Pin,
+  Smartphone,
+  Tag,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
+import { CalendarEvent } from "@/types/calendar";
 
 interface EventPopupProps {
   event: CalendarEvent;
@@ -18,7 +32,13 @@ const PLATFORM_ICONS: Record<string, React.ReactNode> = {
   twitter: <Phone className="h-4 w-4" />,
 };
 
-export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }: EventPopupProps) {
+export function EventPopup({
+  event,
+  anchorRect,
+  onClose,
+  onDelete,
+  deletingId,
+}: EventPopupProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const POPUP_WIDTH = 320;
   const POPUP_OFFSET = 6;
@@ -52,25 +72,32 @@ export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }:
       }
     };
     // Slight delay so the opening click doesn't immediately close it
-    const t = setTimeout(() => document.addEventListener('mousedown', handler), 100);
+    const t = setTimeout(
+      () => document.addEventListener("mousedown", handler),
+      100,
+    );
     return () => {
       clearTimeout(t);
-      document.removeEventListener('mousedown', handler);
+      document.removeEventListener("mousedown", handler);
     };
   }, [onClose]);
 
   // Close on Escape
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
   const isContent = event.isContentPost;
-  const headerBg = isContent ? 'bg-emerald-600' : 'bg-indigo-600';
+  const headerBg = isContent ? "bg-emerald-600" : "bg-indigo-600";
 
-  const formattedDate = new Date(event.date).toLocaleDateString('en-GB', {
-    weekday: 'long', month: 'long', day: 'numeric',
+  const formattedDate = new Date(event.date).toLocaleDateString("en-GB", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
   });
 
   const platformName = event.platform
@@ -78,36 +105,47 @@ export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }:
     : null;
 
   const platformIcon = event.platform
-    ? (PLATFORM_ICONS[event.platform.toLowerCase()] ?? <Smartphone className="h-4 w-4" />)
+    ? (PLATFORM_ICONS[event.platform.toLowerCase()] ?? (
+        <Smartphone className="h-4 w-4" />
+      ))
     : null;
 
   return (
     <div
       ref={popupRef}
-      style={{ position: 'fixed', top, left, width: POPUP_WIDTH, zIndex: 9999 }}
-      className="rounded-xl border border-gray-200 bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+      style={{ position: "fixed", top, left, width: POPUP_WIDTH, zIndex: 9999 }}
+      className="animate-in fade-in zoom-in-95 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl duration-150"
     >
       {/* Header */}
-      <div className={`${headerBg} px-4 py-3 flex items-start justify-between gap-2`}>
-        <div className="flex-1 min-w-0">
-          <p className="text-white font-semibold text-sm leading-snug truncate">{event.title}</p>
-          <p className="text-white/70 text-xs mt-0.5">{formattedDate}</p>
+      <div
+        className={`${headerBg} flex items-start justify-between gap-2 px-4 py-3`}
+      >
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm leading-snug font-semibold text-white">
+            {event.title}
+          </p>
+          <p className="mt-0.5 text-xs text-white/70">{formattedDate}</p>
           {!event.allDay && (
-            <p className="text-white/70 text-xs">{event.startTime} – {event.endTime}</p>
+            <p className="text-xs text-white/70">
+              {event.startTime} – {event.endTime}
+            </p>
           )}
         </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex flex-shrink-0 items-center gap-1">
           <button
-            onClick={() => { onDelete(event.id); onClose(); }}
+            onClick={() => {
+              onDelete(event.id);
+              onClose();
+            }}
             disabled={deletingId === event.id}
-            className="rounded-md p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition disabled:opacity-50"
+            className="rounded-md p-1.5 text-white/80 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
             title="Delete"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition"
+            className="rounded-md p-1.5 text-white/80 transition hover:bg-white/20 hover:text-white"
             title="Close"
           >
             <X className="h-3.5 w-3.5" />
@@ -116,57 +154,79 @@ export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }:
       </div>
 
       {/* Body */}
-      <div className="px-4 py-3 flex flex-col gap-2.5 max-h-80 overflow-y-auto">
-
+      <div className="flex max-h-80 flex-col gap-2.5 overflow-y-auto px-4 py-3">
         {/* Content Post fields */}
         {isContent && (
           <>
             {event.category && (
               <Row icon={<Pin className="h-3.5 w-3.5" />}>
-                <span className="text-gray-800 text-sm">{event.category}</span>
+                <span className="text-sm text-gray-800">{event.category}</span>
               </Row>
             )}
             {platformName && (
               <Row icon={platformIcon}>
-                <span className="text-gray-500 text-sm">Platform: </span>
-                <span className="text-gray-800 text-sm ml-1">{platformName}</span>
+                <span className="text-sm text-gray-500">Platform: </span>
+                <span className="ml-1 text-sm text-gray-800">
+                  {platformName}
+                </span>
               </Row>
             )}
             {event.postType && (
               <Row icon={<Palette className="h-3.5 w-3.5" />}>
-                <span className="text-gray-500 text-sm">Type: </span>
-                <span className="text-gray-800 text-sm ml-1">{event.postType}</span>
+                <span className="text-sm text-gray-500">Type: </span>
+                <span className="ml-1 text-sm text-gray-800">
+                  {event.postType}
+                </span>
               </Row>
             )}
 
             {(event.description || event.caption) && (
-              <div className="border-t border-gray-100 pt-2.5 flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2.5 border-t border-gray-100 pt-2.5">
                 {event.description && (
                   <div className="flex items-start gap-2.5">
-                    <span className="text-gray-400 mt-0.5 flex-shrink-0"><AlignLeft className="h-3.5 w-3.5" /></span>
+                    <span className="mt-0.5 flex-shrink-0 text-gray-400">
+                      <AlignLeft className="h-3.5 w-3.5" />
+                    </span>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Content</p>
-                      <p className="text-sm text-gray-800 leading-relaxed">{event.description}</p>
+                      <p className="mb-1 text-xs text-gray-400">Content</p>
+                      <p className="text-sm leading-relaxed text-gray-800">
+                        {event.description}
+                      </p>
                     </div>
                   </div>
                 )}
                 {event.caption && event.caption !== event.description && (
                   <div className="flex items-start gap-2.5">
-                    <span className="text-gray-400 mt-0.5 flex-shrink-0">
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <span className="mt-0.5 flex-shrink-0 text-gray-400">
+                      <svg
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
                     </span>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Caption</p>
-                      <p className="text-sm text-gray-800 leading-relaxed">{event.caption}</p>
+                      <p className="mb-1 text-xs text-gray-400">Caption</p>
+                      <p className="text-sm leading-relaxed text-gray-800">
+                        {event.caption}
+                      </p>
                     </div>
                   </div>
                 )}
                 {event.hashtags && (
                   <div className="flex items-start gap-2.5">
-                    <span className="text-gray-400 mt-0.5 flex-shrink-0"><Hash className="h-3.5 w-3.5" /></span>
+                    <span className="mt-0.5 flex-shrink-0 text-gray-400">
+                      <Hash className="h-3.5 w-3.5" />
+                    </span>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Hashtags</p>
-                      <p className="text-sm text-indigo-600 leading-relaxed">{event.hashtags}</p>
+                      <p className="mb-1 text-xs text-gray-400">Hashtags</p>
+                      <p className="text-sm leading-relaxed text-indigo-600">
+                        {event.hashtags}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -175,8 +235,13 @@ export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }:
 
             {event.weekLabel && (
               <Row icon={<Calendar className="h-3.5 w-3.5" />}>
-                <span className="text-gray-500 text-sm">{event.weekLabel}</span>
-                {event.weekTheme && <span className="text-gray-400 text-sm"> · {event.weekTheme}</span>}
+                <span className="text-sm text-gray-500">{event.weekLabel}</span>
+                {event.weekTheme && (
+                  <span className="text-sm text-gray-400">
+                    {" "}
+                    · {event.weekTheme}
+                  </span>
+                )}
               </Row>
             )}
           </>
@@ -187,32 +252,43 @@ export function EventPopup({ event, anchorRect, onClose, onDelete, deletingId }:
           <>
             {event.location && (
               <Row icon={<MapPin className="h-3.5 w-3.5" />}>
-                <span className="text-gray-800 text-sm">{event.location}</span>
+                <span className="text-sm text-gray-800">{event.location}</span>
               </Row>
             )}
             {event.participants && (
               <Row icon={<Users className="h-3.5 w-3.5" />}>
-                <span className="text-gray-800 text-sm">{event.participants}</span>
+                <span className="text-sm text-gray-800">
+                  {event.participants}
+                </span>
               </Row>
             )}
             {event.category && (
               <Row icon={<Tag className="h-3.5 w-3.5" />}>
-                <span className="text-gray-800 text-sm">{event.category}</span>
+                <span className="text-sm text-gray-800">{event.category}</span>
               </Row>
             )}
             {event.description && (
               <Row icon={<AlignLeft className="h-3.5 w-3.5" />} alignTop>
-                <span className="text-gray-800 text-sm leading-relaxed">{event.description}</span>
+                <span className="text-sm leading-relaxed text-gray-800">
+                  {event.description}
+                </span>
               </Row>
             )}
             {event.googleEventId && (
               <Row icon={<Calendar className="h-3.5 w-3.5" />}>
-                <span className="text-xs text-green-600 font-medium">Synced to Google Calendar</span>
+                <span className="text-xs font-medium text-green-600">
+                  Synced to Google Calendar
+                </span>
               </Row>
             )}
-            {!event.location && !event.participants && !event.category && !event.description && (
-              <p className="text-sm text-gray-400 py-1">No additional details.</p>
-            )}
+            {!event.location &&
+              !event.participants &&
+              !event.category &&
+              !event.description && (
+                <p className="py-1 text-sm text-gray-400">
+                  No additional details.
+                </p>
+              )}
           </>
         )}
       </div>
@@ -230,9 +306,17 @@ function Row({
   alignTop?: boolean;
 }) {
   return (
-    <div className={`flex gap-2.5 ${alignTop ? 'items-start' : 'items-center'}`}>
-      <span className={`text-gray-400 flex-shrink-0 ${alignTop ? 'mt-0.5' : ''}`}>{icon}</span>
-      <div className="flex flex-wrap items-center gap-0.5 min-w-0">{children}</div>
+    <div
+      className={`flex gap-2.5 ${alignTop ? "items-start" : "items-center"}`}
+    >
+      <span
+        className={`flex-shrink-0 text-gray-400 ${alignTop ? "mt-0.5" : ""}`}
+      >
+        {icon}
+      </span>
+      <div className="flex min-w-0 flex-wrap items-center gap-0.5">
+        {children}
+      </div>
     </div>
   );
 }
