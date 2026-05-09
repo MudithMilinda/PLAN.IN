@@ -7,6 +7,14 @@ import { supabase } from '../config/supabase.js';
 
 const getClerkUserId = (req) => req.body?.clerkUserId || req.query?.clerkUserId;
 
+// ── Helper: targetAudience normalize ────────────────────────────────────────
+// Frontend එකෙන් array එකක් එනවා — DB save කරන්න string, AI-ට pass කරන්න array
+const normalizeAudience = (raw) => {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') return [raw];
+  return [];
+};
+
 export const getEvents = async (req, res) => {
   try {
     const clerkUserId = getClerkUserId(req);
@@ -43,14 +51,39 @@ export const getEventById = async (req, res) => {
 
 export const createEvent = async (req, res) => {
   const clerkUserId = getClerkUserId(req);
-  const { eventName, eventTheme, targetAudience, location, eventDate, additionalInfo } = req.body;
-  if (!clerkUserId || !eventName || !eventTheme || !targetAudience || !location || !eventDate) return res.status(400).json({ error: 'Missing required fields' });
+  const { eventName, eventTheme, location, eventDate, additionalInfo, duration } = req.body;
+
+  // ── targetAudience: array normalize + validate ───────────────────────────
+  const audienceArray = normalizeAudience(req.body.targetAudience);
+  const audienceStr   = audienceArray.join(', ');   // DB + Calendar description-ට
+
+  if (!clerkUserId || !eventName || !eventTheme || audienceArray.length === 0 || !location || !eventDate) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
 
   try {
-    const marketingPlan = await generateMarketingPlan({ eventName, eventTheme, targetAudience, location, eventDate, additionalInfo });
-    const eventDateISO = new Date(eventDate).toISOString();
+    // AI-ට array pass කරනවා (buildPrompt multi-audience handle කරනවා)
+    const marketingPlan = await generateMarketingPlan({
+      eventName, eventTheme,
+      targetAudience: audienceArray,   // ← array
+      duration, location, eventDate, additionalInfo,
+    });
+
+    const eventDateISO  = new Date(eventDate).toISOString();
     const eventDateOnly = eventDateISO.split('T')[0];
-    const { data, error } = await createEventRecord({ clerk_user_id: clerkUserId, event_name: eventName, event_theme: eventTheme, target_audience: targetAudience, location, event_date: eventDateISO, additional_info: additionalInfo || null, marketing_plan: marketingPlan });
+
+    // DB-ට string save කරනවා
+    const { data, error } = await createEventRecord({
+      clerk_user_id:   clerkUserId,
+      event_name:      eventName,
+      event_theme:     eventTheme,
+      target_audience: audienceStr,    // ← "Young Adults, Music Fans, General Public"
+      location,
+      event_date:      eventDateISO,
+      additional_info: additionalInfo || null,
+      marketing_plan:  marketingPlan,
+    });
+
     if (error) return res.status(500).json({ error: 'Failed to save event', supabaseError: error.message });
 
     const savedEvent = data?.[0];
@@ -59,8 +92,6 @@ export const createEvent = async (req, res) => {
     let googleEventId = null;
     let calendarPostsSynced = 0;
 
-    // Don't let a Google auth failure (expired/revoked refresh token) blow up
-    // the whole request — the event is already in Supabase.
     let calendarClient = null;
     try {
       calendarClient = await getCalendarClient(clerkUserId);
@@ -70,7 +101,14 @@ export const createEvent = async (req, res) => {
 
     if (calendarClient) {
       try {
-        const mainRes = await createMainEvent(calendarClient, { summary: `🎉 ${eventName}`, location, description: `Event Theme: ${eventTheme}\nTarget Audience: ${targetAudience}${additionalInfo ? `\nNotes: ${additionalInfo}` : ''}`, start: { date: eventDateOnly, timeZone: 'Asia/Colombo' }, end: { date: eventDateOnly, timeZone: 'Asia/Colombo' }, colorId: '11' });
+        const mainRes = await createMainEvent(calendarClient, {
+          summary:     `🎉 ${eventName}`,
+          location,
+          description: `Event Theme: ${eventTheme}\nTarget Audience: ${audienceStr}${additionalInfo ? `\nNotes: ${additionalInfo}` : ''}`,
+          start: { date: eventDateOnly, timeZone: 'Asia/Colombo' },
+          end:   { date: eventDateOnly, timeZone: 'Asia/Colombo' },
+          colorId: '11',
+        });
         googleEventId = mainRes.data.id;
         await setGoogleEventId(savedEvent.id, googleEventId);
       } catch (e) { console.error('⚠️ Main event Google sync error:', e.message); }
@@ -88,15 +126,28 @@ export const createEvent = async (req, res) => {
           try {
             const gRes = await createChildEvent(calendarClient, {
               summary: `${eventName} — ${post.type}`,
-              description: buildContentPostDescription({ weekTheme: week.theme, platform: post.platform, postType: post.type, contentDescription: post.contentDescription, caption: post.caption, hashtags: post.hashtags }),
-              start: { date: postDate, timeZone: 'Asia/Colombo' }, end: { date: postDate, timeZone: 'Asia/Colombo' }, colorId: '2',
-              extendedProperties: { private: { parentEventId: googleEventId || '', eventName, week: week.week, weekTheme: week.theme }, shared: { eventType: 'marketing_post' } },
+              description: buildContentPostDescription({
+                weekTheme: week.theme, platform: post.platform, postType: post.type,
+                contentDescription: post.contentDescription, caption: post.caption, hashtags: post.hashtags,
+              }),
+              start: { date: postDate, timeZone: 'Asia/Colombo' },
+              end:   { date: postDate, timeZone: 'Asia/Colombo' },
+              colorId: '2',
+              extendedProperties: {
+                private: { parentEventId: googleEventId || '', eventName, week: week.week, weekTheme: week.theme },
+                shared:  { eventType: 'marketing_post' },
+              },
             });
             postGoogleEventId = gRes.data.id;
             calendarPostsSynced++;
           } catch (e) { console.error(`⚠️ Post sync error (${week.week} ${post.day}):`, e.message); }
         }
-        contentPostsToInsert.push({ event_id: savedEvent.id, clerk_user_id: clerkUserId, post_date: postDate, week_label: week.week, week_theme: week.theme, day_label: post.day, platform: post.platform, post_type: post.type, content_description: post.contentDescription, caption: post.caption, hashtags: post.hashtags, google_event_id: postGoogleEventId });
+        contentPostsToInsert.push({
+          event_id: savedEvent.id, clerk_user_id: clerkUserId, post_date: postDate,
+          week_label: week.week, week_theme: week.theme, day_label: post.day,
+          platform: post.platform, post_type: post.type, content_description: post.contentDescription,
+          caption: post.caption, hashtags: post.hashtags, google_event_id: postGoogleEventId,
+        });
       }
     }
 
@@ -105,7 +156,14 @@ export const createEvent = async (req, res) => {
       if (postsError) console.error('⚠️ content_posts insert error:', postsError.message);
     }
 
-    return res.status(201).json({ success: true, message: googleEventId ? `Event saved! Synced to Google Calendar with ${calendarPostsSynced} content posts.` : `Event saved! ${contentPostsToInsert.length} content posts saved to calendar.`, event: { ...savedEvent, eventName, eventTheme, targetAudience, location, eventDate }, marketingPlan, googleEventId, calendarPostsSynced, contentPostsSaved: contentPostsToInsert.length });
+    return res.status(201).json({
+      success: true,
+      message: googleEventId
+        ? `Event saved! Synced to Google Calendar with ${calendarPostsSynced} content posts.`
+        : `Event saved! ${contentPostsToInsert.length} content posts saved to calendar.`,
+      event: { ...savedEvent, eventName, eventTheme, targetAudience: audienceStr, location, eventDate },
+      marketingPlan, googleEventId, calendarPostsSynced, contentPostsSaved: contentPostsToInsert.length,
+    });
   } catch (err) {
     console.error('❌ Error in createEvent:', err);
     if (err.code === 'AI_PARSE_ERROR') return res.status(500).json({ error: 'AI returned unexpected format.' });
@@ -124,9 +182,11 @@ export const updateEvent = async (req, res) => {
     const { data: existing, error: fetchErr } = await getEventByIdService(eventId, clerkUserId);
     if (fetchErr || !existing) return res.status(404).json({ error: 'Event not found or unauthorized' });
 
-    const eventDateISO = new Date(event_date).toISOString();
+    const eventDateISO  = new Date(event_date).toISOString();
     const eventDateOnly = eventDateISO.split('T')[0];
-    const { data: updated, error: updateErr } = await updateEventRecord(eventId, clerkUserId, { event_name, event_date: eventDateISO, location, event_theme, additional_info: description || null });
+    const { data: updated, error: updateErr } = await updateEventRecord(eventId, clerkUserId, {
+      event_name, event_date: eventDateISO, location, event_theme, additional_info: description || null,
+    });
     if (updateErr) return res.status(500).json({ error: 'Failed to update event', details: updateErr.message });
 
     let googleSynced = false;
@@ -134,7 +194,13 @@ export const updateEvent = async (req, res) => {
       try {
         const cal = await getCalendarClient(clerkUserId);
         if (cal) {
-          await updateCalendarEvent(cal, existing.google_event_id, { summary: `🎉 ${event_name}`, location, description: `Event Theme: ${event_theme}${description ? `\nNotes: ${description}` : ''}`, start: { date: eventDateOnly, timeZone: 'Asia/Colombo' }, end: { date: eventDateOnly, timeZone: 'Asia/Colombo' } });
+          await updateCalendarEvent(cal, existing.google_event_id, {
+            summary:     `🎉 ${event_name}`,
+            location,
+            description: `Event Theme: ${event_theme}${description ? `\nNotes: ${description}` : ''}`,
+            start: { date: eventDateOnly, timeZone: 'Asia/Colombo' },
+            end:   { date: eventDateOnly, timeZone: 'Asia/Colombo' },
+          });
           googleSynced = true;
         }
       } catch (e) { console.warn('⚠️ Google patch error:', e.message); }
@@ -204,7 +270,10 @@ export const updateContentPost = async (req, res) => {
       try {
         const calendarClient = await getCalendarClient(clerkUserId);
         if (calendarClient) {
-          const patchBody = { summary: `${eventData?.event_name || 'Event'} — ${updated.post_type}`, description: buildContentPostDescription({ weekTheme: updated.week_theme || '', platform: updated.platform, postType: updated.post_type, contentDescription: updated.content_description, caption: updated.caption, hashtags: updated.hashtags }) };
+          const patchBody = {
+            summary:     `${eventData?.event_name || 'Event'} — ${updated.post_type}`,
+            description: buildContentPostDescription({ weekTheme: updated.week_theme || '', platform: updated.platform, postType: updated.post_type, contentDescription: updated.content_description, caption: updated.caption, hashtags: updated.hashtags }),
+          };
           if (post_date) { patchBody.start = { date: post_date, timeZone: 'Asia/Colombo' }; patchBody.end = { date: post_date, timeZone: 'Asia/Colombo' }; }
           await updateCalendarEvent(calendarClient, existing.google_event_id, patchBody);
           googleSynced = true;

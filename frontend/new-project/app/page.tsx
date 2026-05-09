@@ -28,7 +28,7 @@ export default function Home() {
         <StatsSection />
         <FeaturesGrid />
         <AboutSection />
-        <InfiniteMovingCardsDemo />
+        
         <CTASection />
         <Footer />
       </div>

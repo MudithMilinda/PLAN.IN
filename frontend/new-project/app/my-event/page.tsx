@@ -151,7 +151,7 @@ function MyEventsContent() {
                 Get started by creating your first event
               </p>
               <button
-                onClick={() => router.push("/events/create")}
+                onClick={() => router.push("/generate-plan")}
                 className="mx-auto flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white"
               >
                 <Plus className="h-4 w-4" /> Create Event
@@ -290,11 +290,22 @@ function EventCard({
           </div>
 
           <div className="flex items-center gap-2 text-gray-300">
-            <div className="rounded-lg bg-slate-700/50 p-2">
-              <MapPin className="h-4 w-4" />
-            </div>
-            <span className="text-sm">{event.location}</span>
-          </div>
+  <div className="rounded-lg bg-slate-700/50 p-2">
+    <MapPin className="h-4 w-4" />
+  </div>
+  <span className="text-sm">
+    {(() => {
+      try {
+        const loc = typeof event.location === "string"
+          ? JSON.parse(event.location)
+          : event.location;
+        return loc.venue || loc.city || event.location;
+      } catch {
+        return event.location;
+      }
+    })()}
+  </span>
+</div>
 
           <div className="flex items-center gap-2 text-gray-300">
             <div className="rounded-lg bg-slate-700/50 p-2">

@@ -32,6 +32,16 @@ const PLATFORM_ICONS: Record<string, React.ReactNode> = {
   twitter: <Phone className="h-4 w-4" />,
 };
 
+function formatLocation(location?: string): string {
+  if (!location) return "";
+  try {
+    const parsed = JSON.parse(location);
+    return parsed.venue || parsed.city || location;
+  } catch {
+    return location;
+  }
+}
+
 export function EventPopup({
   event,
   anchorRect,
@@ -252,8 +262,8 @@ export function EventPopup({
           <>
             {event.location && (
               <Row icon={<MapPin className="h-3.5 w-3.5" />}>
-                <span className="text-sm text-gray-800">{event.location}</span>
-              </Row>
+  <span className="text-sm text-gray-800">{formatLocation(event.location)}</span>
+</Row>
             )}
             {event.participants && (
               <Row icon={<Users className="h-3.5 w-3.5" />}>

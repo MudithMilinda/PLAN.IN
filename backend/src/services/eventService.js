@@ -48,3 +48,10 @@ export async function deleteEventRecord(eventId, clerkUserId) {
     .eq('id', eventId)
     .eq('clerk_user_id', clerkUserId);
 }
+
+//Total event count
+export async function getTotalEventCount() {
+  return supabase
+    .from('events')
+    .select('*', { count: 'exact', head: true });
+}

@@ -10,6 +10,7 @@ import {
   deleteContentPost,
 } from '../controllers/eventsController.js';
 import { getUserProfile, upsertUserProfile } from '../controllers/profileController.js';
+import { getTotalEventCount } from '../services/eventService.js';
 
 const router = express.Router();
 
@@ -39,5 +40,12 @@ router.delete('/content-posts/:id', deleteContentPost);
 
 router.post('/profile', getUserProfile);
 router.put('/profile', upsertUserProfile);
+
+// GET /api/events/count
+router.get('/events/count', async (req, res) => {
+  const { count, error } = await getTotalEventCount();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ count });
+});
 
 export default router;
