@@ -109,7 +109,7 @@ export default function CalendarPage() {
 
   return (
     <SidebarDemo>
-      <div className="flex h-screen bg-white">
+      <div className="flex h-auto min-h-screen flex-col bg-white lg:h-screen lg:flex-row">
         <CalendarSidebar
           syncMessage={syncMessage}
           googleConnected={googleConnected}
@@ -132,7 +132,7 @@ export default function CalendarPage() {
           }}
         />
 
-        <div className="flex flex-1 flex-col bg-white">
+        <div className="flex min-h-[70vh] flex-1 flex-col bg-white">
           <CalendarHeader
             currentDate={currentDate}
             googleConnected={googleConnected}

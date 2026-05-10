@@ -23,11 +23,11 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   return (
     <div className="flex-1 overflow-auto">
-      <div className="grid grid-cols-7 border-t border-l border-gray-200">
+      <div className="grid min-w-[700px] grid-cols-7 border-t border-l border-gray-200 md:min-w-0">
         {DAYS_OF_WEEK.map((d, i) => (
           <div
             key={i}
-            className="border-r border-b border-gray-200 bg-gray-50 p-2 text-center text-sm font-semibold text-gray-700"
+            className="border-r border-b border-gray-200 bg-gray-50 p-1.5 text-center text-xs font-semibold text-gray-700 sm:p-2 sm:text-sm"
           >
             {d}
           </div>

@@ -50,7 +50,7 @@ export function CalendarSidebar({
   onNavigateEventDate,
 }: CalendarSidebarProps) {
   return (
-    <div className="flex w-64 flex-col gap-3 bg-[#0b1d33] p-4">
+    <div className="flex w-full flex-col gap-3 bg-[#0b1d33] p-4 lg:w-64 lg:min-w-64">
       {syncMessage && (
         <div
           className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-medium ${syncMessage.type === "success" ? "bg-green-800 text-green-100" : "bg-red-800 text-red-100"}`}

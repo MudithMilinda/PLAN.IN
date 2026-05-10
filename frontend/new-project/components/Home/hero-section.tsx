@@ -2,8 +2,12 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+  const { isSignedIn } = useUser();
+  const router = useRouter();
   const particles = [
     "left-[8%] top-[22%]",
     "left-[18%] top-[78%]",
@@ -82,8 +86,13 @@ export default function HeroSection() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          <button className="rounded-full border border-[#3f5f84]/70 bg-[#040d19]/80 px-7 py-3 text-sm font-medium tracking-[0.01em] text-slate-200 shadow-[0_0_0_1px_rgba(126,170,212,0.15),0_8px_32px_rgba(8,33,57,0.55)] transition hover:border-[#79a1c7] hover:text-white">
-            Start My Campaign
+          <button
+            onClick={() =>
+              router.push(isSignedIn ? "/generate-plan" : "/sign-in")
+            }
+            className="rounded-full border border-[#3f5f84]/70 bg-[#040d19]/80 px-7 py-3 text-sm font-medium tracking-[0.01em] text-slate-200 shadow-[0_0_0_1px_rgba(126,170,212,0.15),0_8px_32px_rgba(8,33,57,0.55)] transition hover:border-[#79a1c7] hover:text-white"
+          >
+            Build Your Marketing Plan Now
           </button>
 
           <motion.div
