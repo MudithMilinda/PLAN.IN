@@ -78,6 +78,7 @@ function safeFilename(eventName?: string): string {
  */
 export async function exportMarketingPlanPDF(
   event: EventDetail,
+  clerkUserId?: string,
   apiBase = "http://localhost:5000",
 ): Promise<void> {
   const endpoint = `${apiBase}/api/export-pdf`;
@@ -87,8 +88,11 @@ export async function exportMarketingPlanPDF(
   try {
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event }),
+      headers: {
+        "Content-Type": "application/json",
+        ...(clerkUserId ? { "x-clerk-user-id": clerkUserId } : {}),
+      },
+      body: JSON.stringify({ event, clerkUserId }),
     });
 
     if (!response.ok) {
