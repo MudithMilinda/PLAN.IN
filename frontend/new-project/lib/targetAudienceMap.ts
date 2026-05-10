@@ -27,7 +27,7 @@ export const targetAudienceMap: Record<string, string[]> = {
     "Art & Culture Lovers",
     "Young Adults (20–30)",
   ],
-  "Conferences": [
+  Conferences: [
     "Corporate Professionals",
     "Business Owners",
     "Industry Experts",
@@ -74,7 +74,7 @@ export const targetAudienceMap: Record<string, string[]> = {
     "Professionals",
     "Young Professionals (25–35)",
   ],
-  "Weddings": [
+  Weddings: [
     "Families",
     "Friends & Relatives",
     "Wedding Guests",
@@ -86,17 +86,8 @@ export const targetAudienceMap: Record<string, string[]> = {
     "Teenagers (13–18)",
     "Adults (18+)",
   ],
-  "Anniversaries": [
-    "Couples",
-    "Families",
-    "Close Friends",
-  ],
-  "Reunions": [
-    "Friends",
-    "Alumni Groups",
-    "Families",
-    "Former Colleagues",
-  ],
+  Anniversaries: ["Couples", "Families", "Close Friends"],
+  Reunions: ["Friends", "Alumni Groups", "Families", "Former Colleagues"],
   "Sports Events / Tournaments": [
     "Sports Fans",
     "Athletes & Players",
@@ -148,11 +139,7 @@ export const targetAudienceMap: Record<string, string[]> = {
     "VIP Attendees",
     "Close Friends & Family",
   ],
-  "Other": [
-    "General Audience",
-    "General Public",
-    "Custom Audience",
-  ],
+  Other: ["General Audience", "General Public", "Custom Audience"],
 };
 
 export const EVENT_CATEGORIES = [

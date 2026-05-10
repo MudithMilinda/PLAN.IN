@@ -1,28 +1,27 @@
 "use client";
 //collapsible weekly calendar
 
-
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, Hash } from "lucide-react";
 import { WeeklyContent } from "../../types/marketing";
 import { CopyButton, PostTypeIcon } from "./shared";
 
 const WEEK_COLORS = [
-  "from-purple-500/20 to-purple-500/5 border-purple-500/30",
+  "from-[#2f6ea8]/25 to-[#2f6ea8]/10 border-[#4a86b8]/35",
   "from-blue-500/20 to-blue-500/5 border-blue-500/30",
   "from-cyan-500/20 to-cyan-500/5 border-cyan-500/30",
   "from-green-500/20 to-green-500/5 border-green-500/30",
   "from-orange-500/20 to-orange-500/5 border-orange-500/30",
-  "from-pink-500/20 to-pink-500/5 border-pink-500/30",
+  "from-[#3f8ab5]/25 to-[#3f8ab5]/10 border-[#5fa7cf]/35",
 ];
 
 const WEEK_DOT_COLORS = [
-  "bg-purple-500",
+  "bg-[#2f6ea8]",
   "bg-blue-500",
   "bg-cyan-500",
   "bg-green-500",
   "bg-orange-500",
-  "bg-pink-500",
+  "bg-[#3f8ab5]",
 ];
 
 export function WeeklyContentCalendar({ weeks }: { weeks: WeeklyContent[] }) {
@@ -81,10 +80,12 @@ export function WeeklyContentCalendar({ weeks }: { weeks: WeeklyContent[] }) {
                           <PostTypeIcon type={post.type} />
                           {post.type}
                         </span>
-                        <span className="rounded-lg border border-purple-500/20 bg-purple-500/10 px-2 py-1 text-xs text-purple-300">
+                        <span className="rounded-lg border border-[#4a86b8]/20 bg-[#2f6ea8]/10 px-2 py-1 text-xs text-[#9ac7e6]">
                           {post.platform}
                         </span>
-                        <span className="text-xs text-gray-500">{post.day}</span>
+                        <span className="text-xs text-gray-500">
+                          {post.day}
+                        </span>
                       </div>
                     </div>
 

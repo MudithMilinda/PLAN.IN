@@ -22,14 +22,14 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 z-50 w-full pt-6">
-      <div className="mx-auto max-w-6xl rounded-full bg-[#1d14536f] shadow-2xl backdrop-blur-lg">
+      <div className="mx-auto max-w-6xl rounded-full bg-[#112842b3] shadow-2xl backdrop-blur-lg">
         <div className="relative flex h-16 items-center justify-between px-6 py-3 text-white md:px-10">
           {/* Logo */}
           <Link
             href="/"
             className="z-20 flex items-center space-x-2 text-2xl font-extrabold tracking-wider text-white"
           >
-            <Rocket className="h-6 w-6 text-[#906ae2]" />
+            <Rocket className="h-6 w-6 text-[#7cb2db]" />
             <span>PLAN.IN</span>
           </Link>
 
@@ -39,7 +39,7 @@ export default function Navbar() {
               <a
                 key={idx}
                 href={item.link}
-                className="p-2 transition hover:text-[#6A2EEF]"
+                className="p-2 transition hover:text-[#8fc0e0]"
               >
                 {item.name}
               </a>
@@ -49,15 +49,9 @@ export default function Navbar() {
           {/* Desktop Buttons */}
           <div className="z-20 hidden items-center gap-4 md:flex">
             <SignedOut>
-              <SignUpButton forceRedirectUrl="/dashboard">
-                <button className="rounded-full px-5 py-2 font-semibold text-white/90 hover:bg-[#3E3466]">
-                  Sign Up
-                </button>
-              </SignUpButton>
-
               <SignInButton forceRedirectUrl="/dashboard">
-                <button className="rounded-full bg-[#6A2EEF] px-6 py-2 font-bold shadow-xl hover:bg-[#7D45FF]">
-                  Log In
+                <button className="rounded-full border border-[#4f5f80] bg-[#101e3b]/55 px-7 py-2 text-base font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
+                  Sign in
                 </button>
               </SignInButton>
             </SignedOut>
@@ -78,7 +72,7 @@ export default function Navbar() {
           {/* Mobile Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="rounded-lg bg-[#2D2350] p-2 md:hidden"
+            className="rounded-lg bg-[#152c48] p-2 md:hidden"
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -87,38 +81,38 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="mt-2 w-full rounded-b-2xl bg-[#1A103B] px-6 py-6 shadow-xl md:hidden">
+        <div className="mt-2 w-full rounded-b-2xl bg-[#10243c] px-6 py-6 shadow-xl md:hidden">
           <div className="flex flex-col gap-4">
             {navItems.map((item, idx) => (
               <a
                 key={idx}
                 href={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full rounded-lg px-4 py-3 text-lg font-medium text-white transition hover:bg-[#2D2350]"
+                className="w-full rounded-lg px-4 py-3 text-lg font-medium text-white transition hover:bg-[#152c48]"
               >
                 {item.name}
               </a>
             ))}
 
             <SignedOut>
+              <SignInButton forceRedirectUrl="/dashboard">
+                <button className="w-full rounded-full border border-[#4f5f80] bg-[#101e3b]/55 py-2.5 text-base font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
+                  Sign in
+                </button>
+              </SignInButton>
+
               <SignUpButton forceRedirectUrl="/dashboard">
-                <button className="w-full rounded-lg bg-[#3E3466] py-3 font-semibold text-white">
+                <button className="w-full rounded-lg bg-[#1b3555] py-3 font-semibold text-white">
                   Sign Up
                 </button>
               </SignUpButton>
-
-              <SignInButton forceRedirectUrl="/dashboard">
-                <button className="w-full rounded-lg bg-[#6A2EEF] py-3 font-bold text-white shadow-md">
-                  Log In
-                </button>
-              </SignInButton>
             </SignedOut>
 
             <SignedIn>
               <Link
                 href="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full rounded-lg bg-[#3E3466] py-3 text-center font-semibold text-white"
+                className="w-full rounded-lg bg-[#1b3555] py-3 text-center font-semibold text-white"
               >
                 Dashboard
               </Link>

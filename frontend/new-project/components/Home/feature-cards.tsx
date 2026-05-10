@@ -54,23 +54,13 @@ export default function FeatureCards() {
         <motion.div
           key={i}
           variants={cardVariants}
-          className="cursor-pointer rounded-2xl border bg-white/5 p-8 backdrop-blur-sm transition duration-300 hover:bg-white/10"
-          style={{ borderColor: "rgba(244, 160, 255, 0.2)" }}
+          className="group cursor-pointer rounded-2xl border border-[#3f6d96]/35 bg-white/5 p-8 backdrop-blur-sm transition duration-300 hover:border-[#6fa8d1]/65 hover:bg-[#0f2236]/75"
           whileHover={{
             scale: 1.05,
-            boxShadow: "0 15px 25px rgba(244, 160, 255, 0.3)",
+            boxShadow: "0 16px 30px rgba(68, 126, 171, 0.35)",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.borderColor = "rgba(244, 160, 255, 0.5)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.borderColor = "rgba(244, 160, 255, 0.2)")
-          }
         >
-          <div
-            className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
-            style={{ backgroundColor: "rgba(244, 160, 255, 0.2)" }}
-          >
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#2f6ea8]/25 text-[#a5d0ec] transition duration-300 group-hover:bg-[#3f8ab5]/35 group-hover:text-[#d4e9f8]">
             {feature.icon}
           </div>
           <h3 className="mb-3 text-xl font-semibold text-white">

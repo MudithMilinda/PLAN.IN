@@ -96,7 +96,7 @@ export function EventModal({
             onChange={(e) =>
               onChangeEvent({ ...newEvent, title: e.target.value })
             }
-            className="w-full border-0 border-b border-gray-300 px-0 py-2 text-2xl text-gray-900 placeholder-gray-400 outline-none focus:border-indigo-500"
+            className="w-full border-0 border-b border-gray-300 px-0 py-2 text-2xl text-gray-900 placeholder-gray-400 outline-none focus:border-[#4a86b8]"
             placeholder="Add title"
           />
           <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeDate(new Date(`${e.target.value}T12:00:00`))
               }
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#4a86b8] focus:outline-none"
             />
           </div>
 
@@ -120,7 +120,7 @@ export function EventModal({
                   onChangeEvent({ ...newEvent, startTime: e.target.value });
                   onClearOverlap();
                 }}
-                className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none"
+                className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#4a86b8] focus:outline-none"
               />
               <span className="text-gray-500">–</span>
               <input
@@ -130,7 +130,7 @@ export function EventModal({
                   onChangeEvent({ ...newEvent, endTime: e.target.value });
                   onClearOverlap();
                 }}
-                className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none"
+                className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#4a86b8] focus:outline-none"
               />
             </div>
           )}
@@ -143,7 +143,7 @@ export function EventModal({
                 onChange={(e) =>
                   onChangeEvent({ ...newEvent, allDay: e.target.checked })
                 }
-                className="h-4 w-4 accent-indigo-600"
+                className="h-4 w-4 accent-[#2f6ea8]"
               />
               <span className="text-sm text-gray-700">All day</span>
             </label>
@@ -157,7 +157,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeEvent({ ...newEvent, participants: e.target.value })
               }
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[#4a86b8] focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -169,7 +169,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeEvent({ ...newEvent, location: e.target.value })
               }
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[#4a86b8] focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -181,7 +181,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeEvent({ ...newEvent, category: e.target.value })
               }
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[#4a86b8] focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -191,7 +191,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeEvent({ ...newEvent, calendar: e.target.value })
               }
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#4a86b8] focus:outline-none"
             >
               {CALENDARS.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -208,7 +208,7 @@ export function EventModal({
               onChange={(e) =>
                 onChangeEvent({ ...newEvent, description: e.target.value })
               }
-              className="min-h-20 flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none"
+              className="min-h-20 flex-1 rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[#4a86b8] focus:outline-none"
             />
           </div>
 
@@ -253,7 +253,7 @@ export function EventModal({
               <button
                 onClick={onSave}
                 disabled={savingEvent || !newEvent.title}
-                className="flex items-center gap-2 rounded bg-indigo-600 px-6 py-2 font-medium text-white transition-all hover:bg-indigo-700 disabled:opacity-60"
+                className="flex items-center gap-2 rounded bg-[#2f6ea8] px-6 py-2 font-medium text-white transition-all hover:bg-[#285f92] disabled:opacity-60"
               >
                 {savingEvent && <Loader2 className="h-4 w-4 animate-spin" />}
                 {savingEvent ? "Saving…" : "Save"}

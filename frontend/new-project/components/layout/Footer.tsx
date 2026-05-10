@@ -19,28 +19,25 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold">Pages</h4>
             <div className="space-y-2 text-sm text-gray-400">
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Home
                 </Link>
               </div>
               <div>
                 <Link
                   href="#services"
-                  className="transition hover:text-purple-300"
+                  className="transition hover:text-[#9ac7e6]"
                 >
                   Services
                 </Link>
               </div>
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Achievement
                 </Link>
               </div>
               <div>
-                <Link
-                  href="#about"
-                  className="transition hover:text-purple-300"
-                >
+                <Link href="#about" className="transition hover:text-[#9ac7e6]">
                   About Us
                 </Link>
               </div>
@@ -50,22 +47,22 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold">Company</h4>
             <div className="space-y-2 text-sm text-gray-400">
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Customer
                 </Link>
               </div>
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Enterprise
                 </Link>
               </div>
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Partners
                 </Link>
               </div>
               <div>
-                <Link href="#" className="transition hover:text-purple-300">
+                <Link href="#" className="transition hover:text-[#9ac7e6]">
                   Jobs
                 </Link>
               </div>
@@ -73,7 +70,7 @@ export default function Footer() {
           </div>
           <div>
             <SignUpButton mode="redirect" forceRedirectUrl="/dashboard">
-              <button className="w-full rounded-full bg-linear-to-r from-purple-600 to-pink-600 px-8 py-3 font-medium transition hover:shadow-lg hover:shadow-purple-500/50">
+              <button className="w-full rounded-full bg-linear-to-r from-[#2f6ea8] to-[#4ba3c7] px-8 py-3 font-medium transition hover:shadow-lg hover:shadow-[#2f6ea8]/35">
                 Sign Up
               </button>
             </SignUpButton>

@@ -31,7 +31,7 @@ export default function RootLayout({
         <body
           className={`${inter.className} min-h-screen text-white`}
           style={{
-            backgroundColor: "#050020",
+            backgroundColor: "#020812",
             backgroundAttachment: "fixed",
           }}
           suppressHydrationWarning

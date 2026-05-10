@@ -10,7 +10,7 @@ import {
 
 export default function SocialStrip() {
   return (
-    <div className="/* SOLID background only */ overflow-hidden rounded-3xl bg-[#050020] py-12">
+    <div className="/* SOLID background only */ overflow-hidden rounded-3xl bg-[#020812] py-12">
       {/* Title */}
       <h2 className="mb-12 text-center text-xl font-semibold text-gray-200">
         Follow Us on Social Media

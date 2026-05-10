@@ -50,7 +50,7 @@ export function CalendarSidebar({
   onNavigateEventDate,
 }: CalendarSidebarProps) {
   return (
-    <div className="flex w-64 flex-col gap-3 bg-indigo-950 p-4">
+    <div className="flex w-64 flex-col gap-3 bg-[#0b1d33] p-4">
       {syncMessage && (
         <div
           className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-medium ${syncMessage.type === "success" ? "bg-green-800 text-green-100" : "bg-red-800 text-red-100"}`}
@@ -103,11 +103,11 @@ export function CalendarSidebar({
       />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mb-2 text-xs font-semibold text-indigo-300">
+        <div className="mb-2 text-xs font-semibold text-[#9ec9e6]">
           MY EVENTS 📅
         </div>
         {loadingEvents ? (
-          <div className="flex items-center gap-2 text-sm text-indigo-300">
+          <div className="flex items-center gap-2 text-sm text-[#9ec9e6]">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading...
           </div>
         ) : backendEvents.length > 0 ? (
@@ -115,7 +115,7 @@ export function CalendarSidebar({
             {backendEvents.map((event) => (
               <div
                 key={event.id}
-                className="group relative flex cursor-pointer flex-col gap-1 rounded-lg bg-indigo-900/40 px-3 py-2 transition hover:bg-indigo-800"
+                className="group relative flex cursor-pointer flex-col gap-1 rounded-lg bg-[#15314d]/50 px-3 py-2 transition hover:bg-[#1c3a59]"
               >
                 <div
                   onClick={() => {
@@ -130,7 +130,7 @@ export function CalendarSidebar({
                   }}
                   className="flex items-start justify-between gap-1"
                 >
-                  <span className="text-sm font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text group-hover:text-transparent">
+                  <span className="text-sm font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-[#7eb6de] group-hover:to-[#9bccea] group-hover:bg-clip-text group-hover:text-transparent">
                     {event.event_name}
                   </span>
                   <div className="flex shrink-0 items-center gap-1">
@@ -156,7 +156,7 @@ export function CalendarSidebar({
                     </button>
                   </div>
                 </div>
-                <span className="text-xs text-indigo-300">
+                <span className="text-xs text-[#9ec9e6]">
                   {new Date(event.event_date).toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "short",
@@ -164,13 +164,13 @@ export function CalendarSidebar({
                   })}
                 </span>
                 {event.location && (
-                  <span className="flex items-center gap-1 text-xs text-indigo-400">
+                  <span className="flex items-center gap-1 text-xs text-[#84b8dd]">
                     <MapPin className="h-3 w-3" />
                     {event.location}
                   </span>
                 )}
                 {event.event_theme && (
-                  <span className="flex items-center gap-1 text-xs text-indigo-400">
+                  <span className="flex items-center gap-1 text-xs text-[#84b8dd]">
                     <Users className="h-3 w-3" />
                     {event.event_theme}
                   </span>
@@ -179,7 +179,7 @@ export function CalendarSidebar({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-indigo-400">No events yet</p>
+          <p className="text-sm text-[#84b8dd]">No events yet</p>
         )}
       </div>
     </div>

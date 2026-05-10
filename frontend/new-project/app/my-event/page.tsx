@@ -106,7 +106,7 @@ function MyEventsContent() {
   return (
     <div
       className="mt-7 min-h-screen p-4 md:p-6"
-      style={{ background: "linear-gradient(to bottom, #050020, #050020)" }}
+      style={{ background: "linear-gradient(to bottom, #020812, #020812)" }}
     >
       <div className="mx-auto max-w-7xl">
         {/* Header */}
@@ -126,7 +126,7 @@ function MyEventsContent() {
         {/* Events List */}
         {loading ? (
           <div className="flex flex-col items-center justify-center gap-4 py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#4a86b8] border-t-transparent" />
             <p className="text-gray-400">Loading your events...</p>
           </div>
         ) : events.length > 0 ? (
@@ -152,7 +152,7 @@ function MyEventsContent() {
               </p>
               <button
                 onClick={() => router.push("/generate-plan")}
-                className="mx-auto flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white"
+                className="mx-auto flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#2f6ea8] to-[#4ba3c7] px-6 py-3 font-semibold text-white"
               >
                 <Plus className="h-4 w-4" /> Create Event
               </button>
@@ -250,17 +250,17 @@ function EventCard({
   return (
     <div
       onClick={onClick}
-      className="group cursor-pointer rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 backdrop-blur-sm transition-all hover:border-purple-500/30 hover:bg-slate-800/60 md:p-6"
+      className="group cursor-pointer rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 backdrop-blur-sm transition-all hover:border-[#4a86b8]/30 hover:bg-slate-800/60 md:p-6"
     >
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Left Side */}
         <div className="flex-1">
           <div className="mb-1 flex items-center gap-3">
-            <h3 className="text-xl font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text group-hover:text-transparent md:text-2xl">
+            <h3 className="text-xl font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-[#7eb6de] group-hover:to-[#9bccea] group-hover:bg-clip-text group-hover:text-transparent md:text-2xl">
               {event.event_name}
             </h3>
             {hasPlan && (
-              <span className="flex items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/15 px-2 py-0.5 text-xs font-medium text-purple-300">
+              <span className="flex items-center gap-1 rounded-full border border-[#4a86b8]/30 bg-[#2f6ea8]/15 px-2 py-0.5 text-xs font-medium text-[#9ac7e6]">
                 <Sparkles className="h-3 w-3" />
                 Plan Ready
               </span>
@@ -290,22 +290,23 @@ function EventCard({
           </div>
 
           <div className="flex items-center gap-2 text-gray-300">
-  <div className="rounded-lg bg-slate-700/50 p-2">
-    <MapPin className="h-4 w-4" />
-  </div>
-  <span className="text-sm">
-    {(() => {
-      try {
-        const loc = typeof event.location === "string"
-          ? JSON.parse(event.location)
-          : event.location;
-        return loc.venue || loc.city || event.location;
-      } catch {
-        return event.location;
-      }
-    })()}
-  </span>
-</div>
+            <div className="rounded-lg bg-slate-700/50 p-2">
+              <MapPin className="h-4 w-4" />
+            </div>
+            <span className="text-sm">
+              {(() => {
+                try {
+                  const loc =
+                    typeof event.location === "string"
+                      ? JSON.parse(event.location)
+                      : event.location;
+                  return loc.venue || loc.city || event.location;
+                } catch {
+                  return event.location;
+                }
+              })()}
+            </span>
+          </div>
 
           <div className="flex items-center gap-2 text-gray-300">
             <div className="rounded-lg bg-slate-700/50 p-2">
@@ -325,7 +326,7 @@ function EventCard({
             </button>
 
             {/* Arrow */}
-            <ChevronRight className="hidden h-5 w-5 text-gray-600 transition-colors group-hover:text-purple-400 md:block" />
+            <ChevronRight className="hidden h-5 w-5 text-gray-600 transition-colors group-hover:text-[#7eb6de] md:block" />
           </div>
         </div>
       </div>

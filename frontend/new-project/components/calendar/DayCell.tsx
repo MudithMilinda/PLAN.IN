@@ -38,12 +38,12 @@ export function DayCell({
     <div
       ref={dayRef}
       onClick={() => onDateClick(fullDate)}
-      className={`min-h-32 cursor-pointer border-r border-b border-gray-200 p-2 transition-colors hover:bg-gray-50 ${selected ? "border-2 border-indigo-400 bg-indigo-50" : "bg-white"} ${!isCurrentMonth ? "text-gray-400" : "text-gray-900"}`}
+      className={`min-h-32 cursor-pointer border-r border-b border-gray-200 p-2 transition-colors hover:bg-gray-50 ${selected ? "border-2 border-[#5d98c6] bg-[#e7f2fa]" : "bg-white"} ${!isCurrentMonth ? "text-gray-400" : "text-gray-900"}`}
     >
       <div
         className={`mb-1 text-sm font-medium ${
           todayDate
-            ? "mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white"
+            ? "mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-[#2f6ea8] text-white"
             : ""
         }`}
       >

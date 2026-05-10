@@ -16,7 +16,7 @@ export default function Home() {
       <div
         className="w-full text-white"
         style={{
-          background: "linear-gradient(to bottom, #050020, #050020, #050020)",
+          background: "linear-gradient(to bottom, #020812, #020812, #020812)",
           backgroundAttachment: "fixed", // keeps background fixed
           minHeight: "100vh",
         }}
@@ -28,7 +28,7 @@ export default function Home() {
         <StatsSection />
         <FeaturesGrid />
         <AboutSection />
-        
+
         <CTASection />
         <Footer />
       </div>

@@ -2,14 +2,7 @@
 //PlanCard, CopyButton, InputField, SelectField
 
 import React, { useState } from "react";
-import {
-  Copy,
-  Check,
-  Video,
-  Layers,
-  Instagram,
-  Image,
-} from "lucide-react";
+import { Copy, Check, Video, Layers, Instagram, Image } from "lucide-react";
 
 // ─── COPY BUTTON ──────────────────────────────────────────────────────────────
 export function CopyButton({ text }: { text: string }) {
@@ -121,7 +114,7 @@ export function InputField({
         className={`${sharedInputClass} ${
           error
             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-            : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
+            : "border-slate-700/50 focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20"
         }`}
       />
       {error && errorMessage && (
@@ -176,14 +169,22 @@ export function SelectField({
         } ${
           error
             ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
-            : "border-slate-700/50 focus:ring-2 focus:ring-purple-500/20"
+            : "border-slate-700/50 focus:ring-2 focus:ring-[#4a86b8]/20"
         }`}
       >
-        <option value="" disabled className="text-sm font-normal text-gray-500 bg-slate-900">
+        <option
+          value=""
+          disabled
+          className="bg-slate-900 text-sm font-normal text-gray-500"
+        >
           {placeholder ?? `Select ${label}`}
         </option>
         {options.map((option) => (
-          <option key={option} value={option} className="text-sm font-normal text-white bg-slate-900">
+          <option
+            key={option}
+            value={option}
+            className="bg-slate-900 text-sm font-normal text-white"
+          >
             {option}
           </option>
         ))}

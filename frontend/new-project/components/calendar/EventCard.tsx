@@ -13,7 +13,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const isContentPost = event.isContentPost;
   const eventClass = isContentPost
     ? "bg-emerald-500 border-l-4 border-blue-500 text-white"
-    : `${cal?.color || "bg-indigo-600"} text-white`;
+    : `${cal?.color || "bg-[#2f6ea8]"} text-white`;
 
   return (
     <div

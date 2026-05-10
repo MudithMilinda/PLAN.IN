@@ -45,7 +45,7 @@ export default function AboutSection() {
       {
         label: "Marketing Impact",
         data: [90, 40],
-        backgroundColor: ["#9F7AEA", "#4A5568"], // purple & gray
+        backgroundColor: ["#5d93bc", "#3f5970"], // purple & gray
         borderRadius: 6,
       },
     ],

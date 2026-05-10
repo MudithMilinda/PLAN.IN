@@ -26,11 +26,11 @@ export default function CTASection() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your mail"
-          className="flex-1 rounded-full border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-sm transition focus:border-purple-500 focus:outline-none"
+          className="flex-1 rounded-full border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-sm transition focus:border-[#4a86b8] focus:outline-none"
         />
         <button
           onClick={handleSubscribe}
-          className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 font-medium transition hover:shadow-lg hover:shadow-purple-500/50"
+          className="rounded-full bg-gradient-to-r from-[#2f6ea8] to-[#4ba3c7] px-8 py-4 font-medium transition hover:shadow-lg hover:shadow-[#2f6ea8]/35"
         >
           Subscribe
         </button>

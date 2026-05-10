@@ -100,10 +100,10 @@ export default function FeaturesGrid() {
           <motion.div
             key={i}
             variants={cardVariants}
-            className="cursor-pointer rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition duration-300 hover:border-purple-500/50 hover:bg-white/10"
+            className="group cursor-pointer rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition duration-300 hover:border-[#5d98c6]/55 hover:bg-[#0f2236]/70"
             whileHover={{ scale: 1.05 }}
           >
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-600/20">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#2f6ea8]/20 text-[#8fc3e6] transition duration-300 group-hover:bg-[#3a7eb2]/30 group-hover:text-[#d3e9f8]">
               {feature.icon}
             </div>
             <h3 className="mb-3 text-xl font-semibold text-white">

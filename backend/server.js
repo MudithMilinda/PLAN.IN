@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import eventRoutes from './src/routes/eventRoutes.js';
 import googleRoutes from './src/routes/googleAuth.js';
+import analyticsRoutes from './src/routes/analytics.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api', eventRoutes);
+app.use('/api', analyticsRoutes);
 app.use(googleRoutes);
 
 // Health check endpoint

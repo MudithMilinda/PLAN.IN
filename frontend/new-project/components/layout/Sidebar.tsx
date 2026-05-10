@@ -61,14 +61,14 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[#050020] text-white">
+    <div className="flex h-screen w-full bg-[#020812] text-white">
       {/* SIDEBAR */}
       <Sidebar
         open={open}
         setOpen={setOpen}
         className="shrink-0 transition-all duration-300"
       >
-        <div className="flex h-full flex-col bg-[#0c0536ba]">
+        <div className="flex h-full flex-col bg-[#0d2238cc]">
           <SidebarBody className="flex h-full flex-col justify-between gap-4">
             {/* Top section */}
             <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
@@ -96,8 +96,8 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
                       className={cn(
                         "flex items-center gap-3 rounded-md px-3 py-2 transition-colors",
                         isActive
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30"
-                          : "text-white hover:bg-[#3d3360]",
+                          ? "bg-gradient-to-r from-[#2f6ea8] to-[#4ba3c7] text-white shadow-lg shadow-[#2f6ea8]/30"
+                          : "text-white hover:bg-[#1b3656]",
                       )}
                     />
                   );
@@ -110,7 +110,7 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
               <div className="flex flex-col gap-2 p-3">
                 <div
                   className={cn(
-                    "flex items-center rounded-md py-2 transition-colors hover:bg-[#3d3360]",
+                    "flex items-center rounded-md py-2 transition-colors hover:bg-[#1b3656]",
                     open ? "justify-start px-3" : "justify-center",
                   )}
                 >
@@ -158,7 +158,7 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
 /* Logo when open */
 export const Logo = () => (
   <div className="flex items-center space-x-2 text-2xl font-extrabold tracking-wider">
-    <Rocket className="h-6 w-6 text-[#906ae2]" />
+    <Rocket className="h-6 w-6 text-[#7cb2db]" />
     <span>PLAN.IN</span>
   </div>
 );
@@ -166,6 +166,6 @@ export const Logo = () => (
 /* Logo when collapsed */
 export const LogoIcon = () => (
   <div className="flex items-center justify-center">
-    <Rocket className="h-6 w-6 text-[#906ae2]" />
+    <Rocket className="h-6 w-6 text-[#7cb2db]" />
   </div>
 );

@@ -102,7 +102,7 @@ export function EventPopup({
   }, [onClose]);
 
   const isContent = event.isContentPost;
-  const headerBg = isContent ? "bg-emerald-600" : "bg-indigo-600";
+  const headerBg = isContent ? "bg-emerald-600" : "bg-[#2f6ea8]";
 
   const formattedDate = new Date(event.date).toLocaleDateString("en-GB", {
     weekday: "long",
@@ -234,7 +234,7 @@ export function EventPopup({
                     </span>
                     <div>
                       <p className="mb-1 text-xs text-gray-400">Hashtags</p>
-                      <p className="text-sm leading-relaxed text-indigo-600">
+                      <p className="text-sm leading-relaxed text-[#2f6ea8]">
                         {event.hashtags}
                       </p>
                     </div>
@@ -262,8 +262,10 @@ export function EventPopup({
           <>
             {event.location && (
               <Row icon={<MapPin className="h-3.5 w-3.5" />}>
-  <span className="text-sm text-gray-800">{formatLocation(event.location)}</span>
-</Row>
+                <span className="text-sm text-gray-800">
+                  {formatLocation(event.location)}
+                </span>
+              </Row>
             )}
             {event.participants && (
               <Row icon={<Users className="h-3.5 w-3.5" />}>

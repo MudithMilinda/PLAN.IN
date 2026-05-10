@@ -54,7 +54,10 @@ export default function StatsSection() {
   const stats = [
     { number: `${animatedFaster}X`, label: "Faster Event Promotion" },
     { number: `${animatedAudience}%`, label: "Better Audience Targeting" },
-    { number: loading ? "..." : animatedEvents.toLocaleString(), label: "Marketing Plans Generated" },
+    {
+      number: loading ? "..." : animatedEvents.toLocaleString(),
+      label: "Marketing Plans Generated",
+    },
   ];
 
   return (

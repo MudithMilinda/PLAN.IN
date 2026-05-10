@@ -2,107 +2,100 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { BackgroundLines } from "@/components/ui/background-lines";
 
 export default function HeroSection() {
+  const particles = [
+    "left-[8%] top-[22%]",
+    "left-[18%] top-[78%]",
+    "left-[30%] top-[14%]",
+    "left-[38%] top-[66%]",
+    "left-[52%] top-[28%]",
+    "left-[61%] top-[81%]",
+    "left-[73%] top-[19%]",
+    "left-[84%] top-[72%]",
+    "left-[91%] top-[40%]",
+    "left-[12%] top-[55%]",
+  ];
+
   return (
-    <div
+    <section
       id="home"
-      className="relative min-h-[calc(100vh-80px)] bg-gradient-to-b from-[#0a0e27] via-[#0d1235] to-[#0a0e27] pt-64"
+      className="relative flex min-h-[calc(100vh-80px)] items-center justify-center overflow-hidden bg-[#020812] px-5 py-40 text-center md:px-8"
     >
-      <BackgroundLines className="flex w-full flex-col items-center justify-center bg-transparent px-4 pb-20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,#21486f_0%,#0a1f34_33%,#020812_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,8,18,0)_0%,#020812_72%)]" />
+      <div className="pointer-events-none absolute top-[-20%] left-1/2 h-[540px] w-[760px] -translate-x-1/2 rounded-full bg-[#4d88bf]/20 blur-[130px]" />
+
+      {particles.map((position, index) => (
         <motion.div
-          className="relative w-full max-w-7xl text-center"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          key={position}
+          className={`pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-slate-300/45 ${position}`}
+          animate={{ opacity: [0.25, 0.7, 0.25] }}
+          transition={{
+            duration: 2.8,
+            repeat: Infinity,
+            delay: index * 0.2,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      <motion.div
+        className="relative z-10 mx-auto w-full max-w-5xl"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+      >
+        <motion.p
+          className="mb-3 text-xs tracking-widest text-gray-400 uppercase"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="relative z-20 mb-16">
-            <motion.p
-              className="mb-3 text-xs tracking-widest text-gray-400 uppercase"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Welcome to PLAN.IN
-            </motion.p>
+          Welcome to PLAN.IN
+        </motion.p>
 
-            <motion.h1
-              className="mb-6 text-5xl leading-tight font-bold text-white md:text-6xl lg:text-7xl"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-            >
-              Promote Your Events
-              <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Reach the Right Audience Instantly
-              </span>
-            </motion.h1>
+        <motion.p
+          className="mx-auto mb-6 max-w-4xl text-3xl leading-tight font-semibold tracking-[-0.02em] text-balance text-white/85 md:text-5xl md:leading-[1.08] lg:text-6xl"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+        >
+          Promote Your Events <br />
+          Reach the Right Audience Instantly
+        </motion.p>
 
-            <motion.p
-              className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-gray-400 md:text-lg"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-            >
-              An all-in-one platform for content creators to manage, analyze,
-              and optimize their digital presence across all channels.
-            </motion.p>
-          </div>
+        <motion.h1
+          className="mx-auto mb-10 max-w-4xl text-base leading-relaxed text-pretty text-slate-300/80 md:text-lg"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35 }}
+        >
+          An all-in-one platform for content creators to manage, analyze, and
+          optimize their digital presence across all channels.
+        </motion.h1>
 
-          {/* Dashboard Preview */}
+        <motion.div
+          className="flex flex-col items-center justify-center gap-7"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <button className="rounded-full border border-[#3f5f84]/70 bg-[#040d19]/80 px-7 py-3 text-sm font-medium tracking-[0.01em] text-slate-200 shadow-[0_0_0_1px_rgba(126,170,212,0.15),0_8px_32px_rgba(8,33,57,0.55)] transition hover:border-[#79a1c7] hover:text-white">
+            Start My Campaign
+          </button>
+
           <motion.div
-            className="relative mx-auto max-w-5xl"
-            initial={{ opacity: 0, y: 60, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            className="text-slate-300/70"
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="absolute inset-0 scale-110 rounded-full bg-purple-500/20 blur-3xl" />
-
-            <div className="relative overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-br from-[#2D2350] to-[#1a0f3d] p-6 shadow-2xl">
-              <div className="mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-red-500" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                  <div className="h-3 w-3 rounded-full bg-green-500" />
-                </div>
-                <div className="flex items-center gap-4 text-xs text-gray-400">
-                  <span>Dashboard</span>
-                  <span>Analytics</span>
-                  <span>Reports</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6">
-                  <div className="mb-2 text-3xl font-bold text-white">
-                    $7.25k
-                  </div>
-                  <div className="text-sm text-gray-400">Total Revenue</div>
-                  <div className="mt-4 h-16 rounded-lg bg-blue-500/10" />
-                </div>
-
-                <div className="rounded-xl border border-cyan-500/30 bg-gradient-to-br from-cyan-600/20 to-cyan-800/20 p-6">
-                  <div className="mb-2 text-3xl font-bold text-white">50%</div>
-                  <div className="text-sm text-gray-400">Engagement Rate</div>
-                  <div className="mx-auto mt-4 h-20 w-20 rounded-full border-8 border-cyan-500 border-t-transparent" />
-                </div>
-
-                <div className="rounded-xl border border-purple-500/30 bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6">
-                  <div className="mb-2 text-3xl font-bold text-white">
-                    12.3k
-                  </div>
-                  <div className="text-sm text-gray-400">Total Views</div>
-                  <div className="mt-4 h-16 rounded-lg bg-purple-500/10" />
-                </div>
-              </div>
-            </div>
+            <p className="text-base">Learn more</p>
+            <p className="mt-1 text-xl">↓</p>
           </motion.div>
         </motion.div>
-      </BackgroundLines>
-    </div>
+      </motion.div>
+    </section>
   );
 }

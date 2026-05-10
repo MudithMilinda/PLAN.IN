@@ -10,7 +10,7 @@ const testimonials = [
     name: "Dazzle Healer",
     title: "Front End Developer",
     avatar: "👩🏽",
-    color: "bg-gradient-to-br from-orange-500 to-pink-500",
+    color: "bg-gradient-to-br from-[#2a6b9c] to-[#4a9dc2]",
   },
   {
     quote:
@@ -34,7 +34,7 @@ const testimonials = [
     name: "Bimosaurus",
     title: "Graphic Designer",
     avatar: "👨🏻",
-    color: "bg-gradient-to-br from-purple-500 to-indigo-500",
+    color: "bg-gradient-to-br from-[#2f6ea8] to-[#4f95bb]",
   },
 ];
 
@@ -47,7 +47,7 @@ export default function ClientFeedback() {
   return (
     <div
       className="min-h-screen px-4 py-16"
-      style={{ backgroundColor: "#050020" }}
+      style={{ backgroundColor: "#020812" }}
     >
       <div className="mx-auto max-w-7xl">
         {/* Header */}

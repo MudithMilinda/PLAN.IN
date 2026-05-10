@@ -2,8 +2,16 @@
 
 import React, { useState } from "react";
 import { Calendar, Clock, MapPin, Building2, Globe } from "lucide-react";
-import { FormData, ErrorState, TouchedState, ApiResult } from "../../types/marketing";
-import { targetAudienceMap, EVENT_CATEGORIES } from "../../lib/targetAudienceMap";
+import {
+  FormData,
+  ErrorState,
+  TouchedState,
+  ApiResult,
+} from "../../types/marketing";
+import {
+  targetAudienceMap,
+  EVENT_CATEGORIES,
+} from "../../lib/targetAudienceMap";
 import { InputField, SelectField } from "./shared";
 
 const DURATION_OPTIONS = [
@@ -29,7 +37,7 @@ interface FormDataMulti extends Omit<FormData, "targetAudience"> {
 const DEFAULT_FORM: FormDataMulti = {
   eventName: "",
   eventTheme: "",
-  targetAudience: [],          // array now
+  targetAudience: [], // array now
   duration: "",
   location: { city: "", venue: "", country: "" },
   eventDate: "",
@@ -49,8 +57,8 @@ const DEFAULT_TOUCHED: TouchedState = { ...DEFAULT_ERRORS };
 
 export function EventForm({ userId, onSuccess }: Props) {
   const [formData, setFormData] = useState<FormDataMulti>(DEFAULT_FORM);
-  const [errors, setErrors]     = useState<ErrorState>(DEFAULT_ERRORS);
-  const [touched, setTouched]   = useState<TouchedState>(DEFAULT_TOUCHED);
+  const [errors, setErrors] = useState<ErrorState>(DEFAULT_ERRORS);
+  const [touched, setTouched] = useState<TouchedState>(DEFAULT_TOUCHED);
   const [audiences, setAudiences] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -71,15 +79,28 @@ export function EventForm({ userId, onSuccess }: Props) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
 
     // Location sub-fields
-    if (name === "locationCity" || name === "locationVenue" || name === "locationCountry") {
+    if (
+      name === "locationCity" ||
+      name === "locationVenue" ||
+      name === "locationCountry"
+    ) {
       const key =
-        name === "locationCity" ? "city" : name === "locationVenue" ? "venue" : "country";
-      setFormData((prev) => ({ ...prev, location: { ...prev.location, [key]: value } }));
+        name === "locationCity"
+          ? "city"
+          : name === "locationVenue"
+            ? "venue"
+            : "country";
+      setFormData((prev) => ({
+        ...prev,
+        location: { ...prev.location, [key]: value },
+      }));
       if (name === "locationCity" && errors.locationCity)
         setErrors((prev) => ({ ...prev, locationCity: false }));
       return;
@@ -88,8 +109,16 @@ export function EventForm({ userId, onSuccess }: Props) {
     // Event theme → update dynamic audience list, reset targetAudience array
     if (name === "eventTheme") {
       setAudiences(targetAudienceMap[value] || []);
-      setFormData((prev) => ({ ...prev, eventTheme: value, targetAudience: [] }));
-      setErrors((prev) => ({ ...prev, eventTheme: false, targetAudience: false }));
+      setFormData((prev) => ({
+        ...prev,
+        eventTheme: value,
+        targetAudience: [],
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        eventTheme: false,
+        targetAudience: false,
+      }));
       return;
     }
 
@@ -106,17 +135,21 @@ export function EventForm({ userId, onSuccess }: Props) {
 
   const validateForm = (): boolean => {
     const newErrors: ErrorState = {
-      eventName:      !formData.eventName.trim(),
-      eventTheme:     !formData.eventTheme.trim(),
-      targetAudience: formData.targetAudience.length === 0,   // array check
-      duration:       !formData.duration.trim(),
-      locationCity:   !formData.location.city.trim(),
-      eventDate:      !formData.eventDate,
+      eventName: !formData.eventName.trim(),
+      eventTheme: !formData.eventTheme.trim(),
+      targetAudience: formData.targetAudience.length === 0, // array check
+      duration: !formData.duration.trim(),
+      locationCity: !formData.location.city.trim(),
+      eventDate: !formData.eventDate,
     };
     setErrors(newErrors);
     setTouched({
-      eventName: true, eventTheme: true, targetAudience: true,
-      duration: true, locationCity: true, eventDate: true,
+      eventName: true,
+      eventTheme: true,
+      targetAudience: true,
+      duration: true,
+      locationCity: true,
+      eventDate: true,
     });
     return !Object.values(newErrors).some(Boolean);
   };
@@ -130,16 +163,16 @@ export function EventForm({ userId, onSuccess }: Props) {
 
     const payload = {
       clerkUserId: userId,
-      eventName:      formData.eventName,
-      eventTheme:     formData.eventTheme,
-      targetAudience: formData.targetAudience,   // string[] sent as-is
-      duration:       formData.duration,
+      eventName: formData.eventName,
+      eventTheme: formData.eventTheme,
+      targetAudience: formData.targetAudience, // string[] sent as-is
+      duration: formData.duration,
       location: {
-        city:    formData.location.city,
-        venue:   formData.location.venue   || undefined,
+        city: formData.location.city,
+        venue: formData.location.venue || undefined,
         country: formData.location.country || undefined,
       },
-      eventDate:      eventDateISO,
+      eventDate: eventDateISO,
       additionalInfo: formData.additionalInfo || undefined,
     };
 
@@ -158,11 +191,11 @@ export function EventForm({ userId, onSuccess }: Props) {
       onSuccess({
         marketingPlan: result.marketingPlan,
         event: {
-          eventName:  result.event.event_name,
-          eventDate:  result.event.event_date,
-          location:   result.event.location,
+          eventName: result.event.event_name,
+          eventDate: result.event.event_date,
+          location: result.event.location,
           eventTheme: result.event.event_theme,
-          duration:   result.event.duration,
+          duration: result.event.duration,
         },
       });
     } catch (err: unknown) {
@@ -175,7 +208,10 @@ export function EventForm({ userId, onSuccess }: Props) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="mt-7 min-h-screen p-4 md:p-6" style={{ background: "#050020" }}>
+    <div
+      className="mt-7 min-h-screen p-4 md:p-6"
+      style={{ background: "#020812" }}
+    >
       <div className="mx-auto max-w-4xl">
         {/* Page header */}
         <div className="mb-8 text-center">
@@ -183,7 +219,8 @@ export function EventForm({ userId, onSuccess }: Props) {
             Tell Us About Your Event
           </h1>
           <p className="text-sm text-gray-400 md:text-base">
-            Fill in your event details below and our AI will create a complete marketing strategy.
+            Fill in your event details below and our AI will create a complete
+            marketing strategy.
           </p>
         </div>
 
@@ -192,8 +229,12 @@ export function EventForm({ userId, onSuccess }: Props) {
           className="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 backdrop-blur-sm md:p-8"
         >
           <div className="mb-6">
-            <h2 className="mb-2 text-2xl font-bold text-white">Event Information</h2>
-            <p className="text-sm text-gray-400">All fields are required unless marked optional.</p>
+            <h2 className="mb-2 text-2xl font-bold text-white">
+              Event Information
+            </h2>
+            <p className="text-sm text-gray-400">
+              All fields are required unless marked optional.
+            </p>
           </div>
 
           <div className="space-y-6">
@@ -216,7 +257,9 @@ export function EventForm({ userId, onSuccess }: Props) {
               name="eventTheme"
               value={formData.eventTheme}
               onChange={handleChange}
-              onBlur={() => handleBlur("eventTheme", !formData.eventTheme.trim())}
+              onBlur={() =>
+                handleBlur("eventTheme", !formData.eventTheme.trim())
+              }
               error={errors.eventTheme && touched.eventTheme}
               errorMessage="Event category is required"
               required
@@ -235,13 +278,13 @@ export function EventForm({ userId, onSuccess }: Props) {
                   {formData.targetAudience.map((a) => (
                     <span
                       key={a}
-                      className="flex items-center gap-1.5 rounded-full bg-purple-600/30 px-3 py-1 text-xs font-medium text-purple-300 border border-purple-500/40"
+                      className="flex items-center gap-1.5 rounded-full border border-[#4a86b8]/40 bg-[#2f6ea8]/30 px-3 py-1 text-xs font-medium text-[#9ac7e6]"
                     >
                       {a}
                       <button
                         type="button"
                         onClick={() => handleAudienceToggle(a)}
-                        className="ml-0.5 text-purple-400 hover:text-white transition-colors"
+                        className="ml-0.5 text-[#7eb6de] transition-colors hover:text-white"
                         aria-label={`Remove ${a}`}
                       >
                         ×
@@ -252,31 +295,34 @@ export function EventForm({ userId, onSuccess }: Props) {
               )}
 
               <div
-                className={`rounded-xl border p-4 bg-slate-900/40 ${
+                className={`rounded-xl border bg-slate-900/40 p-4 ${
                   errors.targetAudience && touched.targetAudience
                     ? "border-red-500"
                     : "border-slate-700/40"
                 }`}
               >
                 {audiences.length === 0 ? (
-                  <p className="text-gray-500 text-sm">Select an Event Category first</p>
+                  <p className="text-sm text-gray-500">
+                    Select an Event Category first
+                  </p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {audiences.map((audience) => {
-                      const checked = formData.targetAudience.includes(audience);
+                      const checked =
+                        formData.targetAudience.includes(audience);
                       return (
                         <label
                           key={audience}
-                          className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2.5 transition-all border ${
+                          className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-all ${
                             checked
-                              ? "bg-purple-600/20 border-purple-500/50 text-white"
-                              : "bg-slate-800/40 border-slate-700/30 text-gray-400 hover:border-slate-600 hover:text-gray-200"
+                              ? "border-[#4a86b8]/50 bg-[#2f6ea8]/20 text-white"
+                              : "border-slate-700/30 bg-slate-800/40 text-gray-400 hover:border-slate-600 hover:text-gray-200"
                           }`}
                         >
                           <div
-                            className={`h-4 w-4 flex-shrink-0 rounded border-2 flex items-center justify-center transition-all ${
+                            className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border-2 transition-all ${
                               checked
-                                ? "bg-purple-600 border-purple-500"
+                                ? "border-[#4a86b8] bg-[#2f6ea8]"
                                 : "border-slate-500"
                             }`}
                           >
@@ -347,7 +393,7 @@ export function EventForm({ userId, onSuccess }: Props) {
                 {/* City — required */}
                 <div>
                   <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-gray-300">
-                    <MapPin className="h-4 w-4 text-purple-400" />
+                    <MapPin className="h-4 w-4 text-[#7eb6de]" />
                     City <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -356,15 +402,19 @@ export function EventForm({ userId, onSuccess }: Props) {
                     value={formData.location.city}
                     placeholder="e.g. Colombo"
                     onChange={handleChange}
-                    onBlur={() => handleBlur("locationCity", !formData.location.city.trim())}
+                    onBlur={() =>
+                      handleBlur("locationCity", !formData.location.city.trim())
+                    }
                     className={`w-full rounded-lg border bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:outline-none ${
                       errors.locationCity && touched.locationCity
                         ? "border-red-500 focus:ring-2 focus:ring-red-500/20"
-                        : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
+                        : "border-slate-700/50 focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20"
                     }`}
                   />
                   {errors.locationCity && touched.locationCity && (
-                    <p className="mt-1 text-sm text-red-400">City is required</p>
+                    <p className="mt-1 text-sm text-red-400">
+                      City is required
+                    </p>
                   )}
                 </div>
 
@@ -373,7 +423,9 @@ export function EventForm({ userId, onSuccess }: Props) {
                   <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-gray-300">
                     <Building2 className="h-4 w-4 text-blue-400" />
                     Venue Name{" "}
-                    <span className="font-normal text-gray-500">(Optional)</span>
+                    <span className="font-normal text-gray-500">
+                      (Optional)
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -381,7 +433,7 @@ export function EventForm({ userId, onSuccess }: Props) {
                     value={formData.location.venue ?? ""}
                     placeholder="e.g. Nelum Pokuna Theatre"
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20 focus:outline-none"
                   />
                 </div>
 
@@ -390,7 +442,9 @@ export function EventForm({ userId, onSuccess }: Props) {
                   <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-gray-300">
                     <Globe className="h-4 w-4 text-cyan-400" />
                     Country{" "}
-                    <span className="font-normal text-gray-500">(Optional)</span>
+                    <span className="font-normal text-gray-500">
+                      (Optional)
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -398,7 +452,7 @@ export function EventForm({ userId, onSuccess }: Props) {
                     value={formData.location.country ?? ""}
                     placeholder="e.g. Sri Lanka"
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20 focus:outline-none"
                   />
                 </div>
               </div>
@@ -420,13 +474,15 @@ export function EventForm({ userId, onSuccess }: Props) {
                   className={`w-full rounded-lg border bg-slate-900/50 py-3 pr-4 pl-12 text-white transition-all focus:outline-none ${
                     errors.eventDate && touched.eventDate
                       ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                      : "border-slate-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
+                      : "border-slate-700/50 focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20"
                   }`}
                   style={{ colorScheme: "dark" }}
                 />
               </div>
               {errors.eventDate && touched.eventDate && (
-                <p className="mt-1 text-sm text-red-400">Event date is required</p>
+                <p className="mt-1 text-sm text-red-400">
+                  Event date is required
+                </p>
               )}
               {formData.eventDate && (
                 <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
@@ -451,7 +507,7 @@ export function EventForm({ userId, onSuccess }: Props) {
                 onChange={handleChange}
                 rows={4}
                 placeholder="Any special requirements, budget hints, or goals"
-                className="w-full resize-none rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                className="w-full resize-none rounded-lg border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-[#4a86b8]/50 focus:ring-2 focus:ring-[#4a86b8]/20 focus:outline-none"
               />
             </div>
 
@@ -459,13 +515,28 @@ export function EventForm({ userId, onSuccess }: Props) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full transform rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 py-4 font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full transform rounded-xl bg-gradient-to-r from-[#2f6ea8] to-[#4ba3c7] py-4 font-semibold text-white shadow-lg shadow-[#2f6ea8]/25 transition-all hover:scale-[1.02] hover:from-[#285f92] hover:to-[#418fb0] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  <svg
+                    className="h-5 w-5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    />
                   </svg>
                   Generating Marketing Plan...
                 </span>
@@ -475,7 +546,8 @@ export function EventForm({ userId, onSuccess }: Props) {
             </button>
 
             <p className="mt-4 text-center text-sm text-gray-400">
-              By submitting, our AI will analyze your event and create a marketing strategy.
+              By submitting, our AI will analyze your event and create a
+              marketing strategy.
             </p>
           </div>
         </form>
