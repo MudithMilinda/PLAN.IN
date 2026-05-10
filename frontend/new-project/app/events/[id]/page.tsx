@@ -676,11 +676,17 @@ function EventDetailContent() {
         )}
 
         <button
-          onClick={() => exportMarketingPlanPDF(event)}
-          className="flex items-center gap-2 rounded-xl border border-[#4a86b8]/30 bg-[#2f6ea8]/10 px-4 py-2 text-sm font-semibold text-[#9ac7e6] transition-all hover:bg-[#2f6ea8]/20"
-        >
-          ⬇ Download PDF
-        </button>
+  onClick={async () => {
+    try {
+      await exportMarketingPlanPDF(event);
+    } catch (err) {
+      alert("PDF export failed. Please try again.");
+    }
+  }}
+  className="flex items-center gap-2 rounded-xl border border-[#4a86b8]/30 bg-[#2f6ea8]/10 px-4 py-2 text-sm font-semibold text-[#9ac7e6] transition-all hover:bg-[#2f6ea8]/20"
+>
+  ⬇ Download PDF
+</button>
 
         {/* Back button bottom */}
         <div className="pb-8">
