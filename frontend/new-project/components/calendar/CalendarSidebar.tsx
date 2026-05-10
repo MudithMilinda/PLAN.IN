@@ -166,7 +166,14 @@ export function CalendarSidebar({
                 {event.location && (
                   <span className="flex items-center gap-1 text-xs text-[#84b8dd]">
                     <MapPin className="h-3 w-3" />
-                    {event.location}
+                    {(() => {
+                      try {
+                        const parsed = JSON.parse(event.location);
+                        return parsed.venue ?? event.location;
+                      } catch {
+                        return event.location;
+                      }
+                    })()}
                   </span>
                 )}
                 {event.event_theme && (
