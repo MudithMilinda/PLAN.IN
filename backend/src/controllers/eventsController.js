@@ -246,48 +246,125 @@ export const deleteEvent = async (req, res) => {
 
 export const updateContentPost = async (req, res) => {
   try {
-    const { id } = req.params;
-    const clerkUserId = getClerkUserId(req);
-    const { caption, hashtags, content_description, platform, post_type, post_date } = req.body;
-    if (!clerkUserId || !id) return res.status(400).json({ error: 'Missing required fields' });
-    const { data: existing, error: fetchError } = await getContentPostById(id, clerkUserId);
-    if (fetchError || !existing) return res.status(404).json({ error: 'Content post not found or unauthorized' });
+    let { id } = req.params;
+    
+    // Strip "content-" prefix if present (from frontend's display ID)
+    if (id && id.startsWith("content-")) {
+      id = id.substring(8);
+    }
+    
+    const clerkUserId = req.body?.clerkUserId || req.query?.clerkUserId;
 
-    const { data: eventData } = await supabase.from('events').select('event_name').eq('id', existing.event_id).single();
+    console.log('[updateContentPost] id:', id, '| clerkUserId:', clerkUserId);
+    console.log('[updateContentPost] full body:', req.body);
+
+    if (!clerkUserId || !id) {
+      return res.status(400).json({ 
+        error: 'Missing required fields', 
+        debug: { id, clerkUserId } 
+      });
+    }
+
+    const { data: existing, error: fetchError } = await getContentPostById(id, clerkUserId);
+
+    console.log('[updateContentPost] existing:', existing, '| fetchError:', fetchError);
+
+    if (fetchError || !existing) {
+      return res.status(404).json({
+        error: 'Content post not found or unauthorized',
+        details: fetchError?.message || 'No matching post found',
+        debug: { id, clerkUserId },
+      });
+    }
+
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('event_name')
+      .eq('id', existing.event_id)
+      .single();
+
+    const { caption, hashtags, content_description, platform, post_type, post_date } = req.body;
+
     const updates = {};
-    if (caption !== undefined) updates.caption = caption;
-    if (hashtags !== undefined) updates.hashtags = hashtags;
+    if (caption !== undefined)             updates.caption             = caption;
+    if (hashtags !== undefined)            updates.hashtags            = hashtags;
     if (content_description !== undefined) updates.content_description = content_description;
-    if (platform !== undefined) updates.platform = platform;
-    if (post_type !== undefined) updates.post_type = post_type;
-    if (post_date !== undefined) updates.post_date = post_date;
+    if (platform !== undefined)            updates.platform            = platform;
+    if (post_type !== undefined)           updates.post_type           = post_type;
+    if (post_date !== undefined)           updates.post_date           = post_date;
+
+    console.log('[updateContentPost] updates to apply:', updates);
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
 
     const { data: updated, error: updateError } = await updateContentPostService(id, clerkUserId, updates);
-    if (updateError) return res.status(500).json({ error: 'Failed to update content post', details: updateError.message });
+
+    if (updateError) {
+      console.error('[updateContentPost] DB update error:', updateError);
+      return res.status(500).json({
+        error: 'Failed to update content post',
+        details: updateError.message,
+      });
+    }
 
     let googleSynced = false;
+
     if (existing.google_event_id) {
       try {
         const calendarClient = await getCalendarClient(clerkUserId);
         if (calendarClient) {
           const patchBody = {
-            summary:     `${eventData?.event_name || 'Event'} — ${updated.post_type}`,
-            description: buildContentPostDescription({ weekTheme: updated.week_theme || '', platform: updated.platform, postType: updated.post_type, contentDescription: updated.content_description, caption: updated.caption, hashtags: updated.hashtags }),
+            summary: `${eventData?.event_name || 'Event'} — ${updated.post_type}`,
+            description: buildContentPostDescription({
+              weekTheme:          updated.week_theme         || '',
+              platform:           updated.platform,
+              postType:           updated.post_type,
+              contentDescription: updated.content_description,
+              caption:            updated.caption,
+              hashtags:           updated.hashtags,
+            }),
           };
-          if (post_date) { patchBody.start = { date: post_date, timeZone: 'Asia/Colombo' }; patchBody.end = { date: post_date, timeZone: 'Asia/Colombo' }; }
+          if (post_date) {
+            patchBody.start = { date: post_date, timeZone: 'Asia/Colombo' };
+            patchBody.end   = { date: post_date, timeZone: 'Asia/Colombo' };
+          }
           await updateCalendarEvent(calendarClient, existing.google_event_id, patchBody);
           googleSynced = true;
         }
-      } catch (e) { console.warn('⚠️ Google Calendar patch error:', e.message); }
+      } catch (e) {
+        console.warn('[updateContentPost] Google Calendar patch error:', e.message);
+      }
     }
 
-    return res.status(200).json({ success: true, message: googleSynced ? 'Content post updated & synced to Google Calendar' : 'Content post updated', post: updated, googleSynced });
-  } catch (err) { return res.status(500).json({ error: 'Internal server error', details: err.message }); }
+    return res.status(200).json({
+      success: true,
+      message: googleSynced
+        ? 'Content post updated & synced to Google Calendar'
+        : 'Content post updated',
+      post: updated,
+      googleSynced,
+    });
+
+  } catch (err) {
+    console.error('[updateContentPost] Unexpected error:', err);
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: err.message,
+    });
+  }
 };
 
 export const deleteContentPost = async (req, res) => {
   try {
-    const { id } = req.params;
+    let { id } = req.params;
+    
+    // Strip "content-" prefix if present (from frontend's display ID)
+    if (id && id.startsWith("content-")) {
+      id = id.substring(8);
+    }
+    
     const clerkUserId = getClerkUserId(req);
     if (!clerkUserId || !id) return res.status(400).json({ error: 'Missing required fields' });
     const { data: existing, error: fetchError } = await getContentPostById(id, clerkUserId);

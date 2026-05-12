@@ -22,7 +22,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 z-50 w-full pt-6">
-      <div className="mx-auto max-w-6xl rounded-full bg-[#112842b3] shadow-2xl backdrop-blur-lg">
+      <div className="mx-auto max-w-6xl rounded-full bg-[#112842b3]/50 shadow-2xl backdrop-blur-lg">
         <div className="relative flex h-16 items-center justify-between px-6 py-3 text-white md:px-10">
           {/* Logo */}
           <Link
@@ -50,7 +50,7 @@ export default function Navbar() {
           <div className="z-20 hidden items-center gap-4 md:flex">
             <SignedOut>
               <SignInButton forceRedirectUrl="/dashboard">
-                <button className="rounded-full border border-[#4f5f80] bg-[#101e3b]/55 px-7 py-2 text-base font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
+                <button className="rounded-full border border-[#4f5f80] bg-[#112842b3]/60 px-7 py-2 text-sm font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
                   Sign in
                 </button>
               </SignInButton>

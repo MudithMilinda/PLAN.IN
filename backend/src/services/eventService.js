@@ -3,7 +3,7 @@ import { supabase } from '../config/supabase.js';
 export async function getEventsByUser(clerkUserId) {
   return supabase
     .from('events')
-    .select('id, event_name, event_theme, target_audience, location, event_date, marketing_plan, google_event_id')
+    .select('id, event_name, event_theme, target_audience, additional_info, location, event_date, marketing_plan, google_event_id')
     .eq('clerk_user_id', clerkUserId)
     .order('event_date', { ascending: false });
 }

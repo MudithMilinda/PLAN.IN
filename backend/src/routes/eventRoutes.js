@@ -11,6 +11,7 @@ import {
 } from '../controllers/eventsController.js';
 import { getUserProfile, upsertUserProfile } from '../controllers/profileController.js';
 import { getTotalEventCount } from '../services/eventService.js';
+import { deletePostMedia, uploadPostMedia } from '../controllers/uploadMediaController.js';
 
 const router = express.Router();
 
@@ -35,11 +36,16 @@ router.post('/events/update', updateEvent);
 router.post('/events/:id', getEventById);
 router.delete('/events/:id', deleteEvent);
 
-router.put('/content-posts/:id', updateContentPost);
+
+router.patch('/content-posts/:id', updateContentPost);
 router.delete('/content-posts/:id', deleteContentPost);
 
 router.post('/profile', getUserProfile);
 router.put('/profile', upsertUserProfile);
+
+// Media upload endpoint
+router.post('/content-posts/:id/media', uploadPostMedia);
+router.delete('/content-posts/:id/media', deletePostMedia);
 
 // GET /api/events/count
 router.get('/events/count', async (req, res) => {

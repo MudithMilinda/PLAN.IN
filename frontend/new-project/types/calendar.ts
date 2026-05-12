@@ -15,10 +15,12 @@ export interface CalendarEvent {
   rawPostId?: string;
   platform?: string;
   postType?: string;
+  contentDescription?: string;
   caption?: string;
   hashtags?: string;
   weekLabel?: string;
   weekTheme?: string;
+  media_urls?: string[];
 }
 
 export interface BackendEvent {
@@ -27,6 +29,8 @@ export interface BackendEvent {
   event_date: string;
   location: string;
   event_theme: string;
+  target_audience?: string | null;
+  additional_info?: string | null;
   google_event_id?: string;
 }
 
@@ -42,6 +46,8 @@ export interface BackendContentPost {
   hashtags: string;
   google_event_id?: string;
   event_name?: string | null;
+  event_theme?: string | null;
+  media_urls?: string[] | null;
 }
 
 export interface NewEventData {

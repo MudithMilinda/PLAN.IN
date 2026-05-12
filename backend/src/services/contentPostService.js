@@ -14,15 +14,16 @@ export async function getContentPosts(clerkUserId) {
 
   const eventsQuery = await supabase
     .from('events')
-    .select('id, event_name')
+    .select('id, event_name, event_theme')
     .in('id', eventIds);
 
   if (eventsQuery.error) return postsQuery;
 
-  const eventNameById = new Map((eventsQuery.data || []).map((e) => [e.id, e.event_name]));
+  const eventById = new Map((eventsQuery.data || []).map((e) => [e.id, e]));
   const merged = postsQuery.data.map((post) => ({
     ...post,
-    event_name: eventNameById.get(post.event_id) || null,
+    event_name: eventById.get(post.event_id)?.event_name || null,
+    event_theme: eventById.get(post.event_id)?.event_theme || null,
   }));
 
   return { data: merged, error: null };
