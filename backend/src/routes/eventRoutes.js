@@ -26,7 +26,8 @@ router.use((req, res, next) => {
   if (resolved) req.body.clerkUserId = resolved;
 
   const isPublicRoute =
-    req.method === 'GET' && req.path === '/events/count';
+    (req.method === 'GET' && req.path === '/events/count') ||
+    (req.method === 'POST' && req.path === '/subscribe');
 
   const userLabel = isPublicRoute
     ? resolved || 'PUBLIC'

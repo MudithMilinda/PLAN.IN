@@ -7,6 +7,7 @@ import analyticsRoutes from './src/routes/analytics.js';
 import exportPdfRouter from "./api/exportPdf.js";
 import './scheduler/telegramScheduler.js';
 import telegramRoutes from './src/routes/telegramRoutes.js';
+import subscribeRoutes from './src/routes/subscribeRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 app.use('/api', eventRoutes);
 app.use('/api', analyticsRoutes);
 app.use('/api', telegramRoutes); 
+app.use('/api', subscribeRoutes);
 app.use(googleRoutes);
 app.use(exportPdfRouter); 
 
