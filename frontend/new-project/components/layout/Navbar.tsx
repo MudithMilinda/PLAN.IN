@@ -49,7 +49,7 @@ export default function Navbar() {
           {/* Desktop Buttons */}
           <div className="z-20 hidden items-center gap-4 md:flex">
             <SignedOut>
-              <SignInButton forceRedirectUrl="/dashboard">
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="rounded-full border border-[#4f5f80] bg-[#112842b3]/60 px-7 py-2 text-sm font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
                   Sign in
                 </button>
@@ -95,13 +95,13 @@ export default function Navbar() {
             ))}
 
             <SignedOut>
-              <SignInButton forceRedirectUrl="/dashboard">
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="w-full rounded-full border border-[#4f5f80] bg-[#101e3b]/55 py-2.5 text-base font-medium text-white transition hover:border-[#687a9d] hover:bg-[#15284d]/70">
                   Sign in
                 </button>
               </SignInButton>
 
-              <SignUpButton forceRedirectUrl="/dashboard">
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="w-full rounded-lg bg-[#1b3555] py-3 font-semibold text-white">
                   Sign Up
                 </button>

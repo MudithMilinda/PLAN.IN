@@ -25,7 +25,14 @@ router.use((req, res, next) => {
   const resolved = fromBody || fromQuery || fromHeader;
   if (resolved) req.body.clerkUserId = resolved;
 
-  console.log(`[${req.method}] ${req.path} | clerkUserId: ${resolved || '❌ MISSING'}`);
+  const isPublicRoute =
+    req.method === 'GET' && req.path === '/events/count';
+
+  const userLabel = isPublicRoute
+    ? resolved || 'PUBLIC'
+    : resolved || '❌ MISSING';
+
+  console.log(`[${req.method}] ${req.path} | clerkUserId: ${userLabel}`);
   next();
 });
 

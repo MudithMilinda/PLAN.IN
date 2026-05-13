@@ -15,7 +15,6 @@ import {
 import { InputField, SelectField } from "./shared";
 
 const DURATION_OPTIONS = [
-  "Half Day (< 4 hours)",
   "1 Day",
   "2–3 Days",
   "1 Week Campaign",
@@ -370,9 +369,9 @@ export function EventForm({ userId, onSuccess }: Props) {
               )}
             </div>
 
-            {/* ── Event Duration ── */}
+            {/* ── Campaign Duration ── */}
             <SelectField
-              label="Event Duration"
+              label="Campaign Duration"
               name="duration"
               value={formData.duration}
               onChange={handleChange}
