@@ -90,9 +90,7 @@ export default function CalendarPage() {
     selectDate(date);
   };
 
-  
   const handleGridEventClick = (event: CalendarEvent, rect: DOMRect) => {
-   
     if (popupEvent?.id === event.id) {
       closePopup();
       return;

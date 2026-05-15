@@ -1,13 +1,13 @@
 //all TypeScript interfaces
 
-//  LOCATION 
+//  LOCATION
 export interface LocationData {
   city: string;
   venue?: string;
   country?: string;
 }
 
-//  FORM TYPES 
+//  FORM TYPES
 export interface FormData {
   eventName: string;
   eventTheme: string;
@@ -30,7 +30,7 @@ export type ErrorState = {
 
 export type TouchedState = ErrorState;
 
-//  MARKETING PLAN TYPES 
+//  MARKETING PLAN TYPES
 export interface WeeklyPost {
   day: string;
   type: string;

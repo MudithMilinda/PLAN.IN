@@ -58,9 +58,7 @@ function formatLocation(location?: string): string {
 const API_BASE =
   process.env.NEXT_PUBLIC_VITE_API_URL ?? "http://localhost:5000";
 
-
 // Media Helpers
-
 
 function isVideo(url: string) {
   return /\.(mp4|mov|webm|avi)(\?|$)/i.test(url);
@@ -84,9 +82,7 @@ function MediaThumb({ url }: { url: string }) {
   );
 }
 
-
 // Editable Field
-
 
 function EditableField({
   label,
@@ -195,7 +191,6 @@ function EditableField({
 }
 
 //  Telegram Schedule Modal
-
 
 interface TelegramGroup {
   id: number;
@@ -540,9 +535,7 @@ function TelegramScheduleModal({
   );
 }
 
-
 // Main Component
-
 
 export function EventPopup({
   event,
@@ -560,15 +553,11 @@ export function EventPopup({
   const POPUP_WIDTH = 340;
   const POPUP_OFFSET = 6;
 
- 
-  // Telegram Modal State  
- 
+  // Telegram Modal State
 
   const [showTelegramModal, setShowTelegramModal] = useState(false);
 
-
   // Editable states
-
 
   const [localContent, setLocalContent] = useState(
     event.contentDescription ?? event.description ?? "",
@@ -582,9 +571,7 @@ export function EventPopup({
     setLocalHashtags(event.hashtags ?? "");
   }, [event]);
 
-  
   // Media states
-  
 
   const [mediaUrls, setMediaUrls] = useState<string[]>(
     Array.isArray(event.media_urls) ? event.media_urls : [],
@@ -598,9 +585,7 @@ export function EventPopup({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [deletingMediaUrl, setDeletingMediaUrl] = useState<string | null>(null);
 
-
   // Position
-
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
@@ -622,9 +607,7 @@ export function EventPopup({
 
   top = Math.max(12, top);
 
-  
   // Close handlers
-
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -659,9 +642,7 @@ export function EventPopup({
     return () => document.removeEventListener("keydown", handler);
   }, [onClose, showTelegramModal]);
 
-  
   // Helpers
-  
 
   const clerkUserId = userId ?? "";
   const postId = event.isContentPost ? event.rawPostId : event.id;
@@ -686,9 +667,7 @@ export function EventPopup({
     return json;
   }
 
-
   // Upload Media
-
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -734,9 +713,7 @@ export function EventPopup({
     }
   }
 
- 
   // Delete Media
- 
 
   async function handleDeleteMedia(urlToDelete: string) {
     if (!postId) {
@@ -770,9 +747,7 @@ export function EventPopup({
     }
   }
 
-
   // UI
-
 
   const isContent = event.isContentPost;
   const headerBg = isContent ? "bg-emerald-600" : "bg-[#2f6ea8]";
@@ -1065,9 +1040,7 @@ export function EventPopup({
   );
 }
 
-
 // Row Helper
-
 
 function Row({
   icon,

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { SidebarDemo } from "@/components/layout/Sidebar";
 import { MapPin, TrendingUp, Activity } from "lucide-react";
 
-
 interface EventItem {
   id: string;
   event_name: string;
@@ -44,15 +43,11 @@ function getVenueOnly(location: string) {
     if (parsed && typeof parsed === "object" && "venue" in parsed) {
       return String((parsed as { venue?: string }).venue || "Location TBD");
     }
-  } catch {
-  
-  }
+  } catch {}
   return location;
 }
 
-
-//Helpers 
-
+//Helpers
 
 function useClock() {
   const [now, setNow] = useState(new Date());
@@ -63,9 +58,7 @@ function useClock() {
   return now;
 }
 
-
-//Sub-components                                                 
-
+//Sub-components
 
 //Live clock + greeting hero card
 function HeroCard({ name }: { name: string }) {
@@ -387,7 +380,6 @@ function DashboardContent({
     </div>
   );
 }
-
 
 /*  Page entry point                                                   */
 

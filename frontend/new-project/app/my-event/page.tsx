@@ -79,7 +79,6 @@ function MyEventsContent() {
     setDeleting(true);
 
     try {
-      
       const response = await fetch(
         `http://localhost:5000/api/events/${deleteModal.event.id}?clerkUserId=${user.id}`,
         {
@@ -234,7 +233,7 @@ function MyEventsContent() {
   );
 }
 
-//  Event Card 
+//  Event Card
 function EventCard({
   event,
   onClick,

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  *
  * Calls the backend /api/export-pdf endpoint and triggers a browser download.
  * Backend expects: { event: EventDetail }
@@ -114,7 +114,7 @@ export async function exportMarketingPlanPDF(
     throw err;
   }
 
-  //  Trigger browser download 
+  //  Trigger browser download
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
