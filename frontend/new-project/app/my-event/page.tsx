@@ -79,8 +79,7 @@ function MyEventsContent() {
     setDeleting(true);
 
     try {
-      // ✅ clerkUserId query param හරහා යවනවා
-      // DELETE requests වලදී fetch() body ignore කරනවා — query param safe
+      
       const response = await fetch(
         `http://localhost:5000/api/events/${deleteModal.event.id}?clerkUserId=${user.id}`,
         {
@@ -235,7 +234,7 @@ function MyEventsContent() {
   );
 }
 
-// ─── Event Card ───────────────────────────────────────────────────────────────
+//  Event Card 
 function EventCard({
   event,
   onClick,

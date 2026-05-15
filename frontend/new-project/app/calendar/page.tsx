@@ -90,9 +90,9 @@ export default function CalendarPage() {
     selectDate(date);
   };
 
-  // Called from CalendarGrid/DayCell — receives the card's DOMRect
+  
   const handleGridEventClick = (event: CalendarEvent, rect: DOMRect) => {
-    // Toggle: clicking the same event closes the popup
+   
     if (popupEvent?.id === event.id) {
       closePopup();
       return;

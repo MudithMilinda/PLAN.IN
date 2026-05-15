@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { Copy, Check, Video, Layers, Instagram, Image } from "lucide-react";
 
-// ─── COPY BUTTON ──────────────────────────────────────────────────────────────
+//  COPY BUTTON 
 export function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -34,7 +34,7 @@ export function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── POST TYPE ICON ───────────────────────────────────────────────────────────
+//  POST TYPE ICON 
 export function PostTypeIcon({ type }: { type: string }) {
   const t = type.toLowerCase();
   if (t.includes("video") || t.includes("reel"))
@@ -45,7 +45,7 @@ export function PostTypeIcon({ type }: { type: string }) {
   return <Image className="h-3.5 w-3.5" />;
 }
 
-// ─── PLAN CARD ────────────────────────────────────────────────────────────────
+//  PLAN CARD 
 export function PlanCard({
   icon,
   title,
@@ -68,14 +68,14 @@ export function PlanCard({
   );
 }
 
-// ─── SHARED PLACEHOLDER STYLE (font-size + family එකම) ───────────────────────
-// සියලුම input/select/textarea වලට apply වෙන common style object
+// SHARED PLACEHOLDER STYLE 
+
 const sharedInputClass =
   "w-full rounded-lg border bg-slate-900/50 px-4 py-3 text-sm font-normal text-white " +
   "placeholder:text-sm placeholder:font-normal placeholder:text-gray-500 " +
   "transition-all focus:outline-none";
 
-// ─── INPUT FIELD ──────────────────────────────────────────────────────────────
+//  INPUT FIELD 
 interface InputProps {
   label: string;
   name: string;
@@ -124,7 +124,7 @@ export function InputField({
   );
 }
 
-// ─── SELECT FIELD ─────────────────────────────────────────────────────────────
+//  SELECT FIELD 
 interface SelectProps {
   label: string;
   name: string;

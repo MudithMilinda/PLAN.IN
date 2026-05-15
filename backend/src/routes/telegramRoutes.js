@@ -7,7 +7,7 @@ function buildTelegramMessage(caption, hashtags, fallback = '') {
   return [caption, hashtags].filter(Boolean).join('\n\n').trim() || fallback;
 }
 
-// ── Add Telegram Group ──────────────────────────────
+//  Add Telegram Group 
 router.post('/telegram/groups', async (req, res) => {
   const { clerkUserId, groupName, chatId } = req.body;
 
@@ -29,8 +29,8 @@ router.post('/telegram/groups', async (req, res) => {
   res.json(data);
 });
 
-// ── Get User's Groups ───────────────────────────────
-// ── Get All Groups (all users see same groups) ──
+//  Get User's Groups 
+//  Get All Groups (all users see same groups)
 router.get('/telegram/groups', async (req, res) => {
   const { data, error } = await supabase
     .from('telegram_groups')
@@ -41,7 +41,7 @@ router.get('/telegram/groups', async (req, res) => {
   res.json(data);
 });
 
-// ── Delete Group ────────────────────────────────────
+//  Delete Group 
 router.delete('/telegram/groups/:id', async (req, res) => {
   const { clerkUserId } = req.body;
 
@@ -55,7 +55,7 @@ router.delete('/telegram/groups/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// ── Schedule Post ───────────────────────────────────
+//  Schedule Post 
 router.post('/telegram/schedule', async (req, res) => {
   const { clerkUserId, postId, chatIds, message, mediaUrls, scheduledAt } = req.body;
 
@@ -102,7 +102,7 @@ router.post('/telegram/schedule', async (req, res) => {
   res.json({ scheduled: chatIds.length });
 });
 
-// ── Get Scheduled Posts For a Content Post ─────────
+//  Get Scheduled Posts For a Content Post 
 router.get('/telegram/schedules', async (req, res) => {
   const { clerkUserId, postId } = req.query;
 
@@ -144,7 +144,7 @@ router.get('/telegram/schedules', async (req, res) => {
   res.json(merged);
 });
 
-// ── Delete Scheduled Telegram Row ───────────────────
+//  Delete Scheduled Telegram Row 
 router.delete('/telegram/schedules/:id', async (req, res) => {
   const { clerkUserId } = req.body;
   const { id } = req.params;

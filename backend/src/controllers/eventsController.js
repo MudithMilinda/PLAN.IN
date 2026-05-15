@@ -7,8 +7,8 @@ import { supabase } from '../config/supabase.js';
 
 const getClerkUserId = (req) => req.body?.clerkUserId || req.query?.clerkUserId;
 
-// ── Helper: targetAudience normalize ────────────────────────────────────────
-// Frontend එකෙන් array එකක් එනවා — DB save කරන්න string, AI-ට pass කරන්න array
+//  Helper: targetAudience normalize 
+
 const normalizeAudience = (raw) => {
   if (Array.isArray(raw)) return raw;
   if (typeof raw === 'string') return [raw];
@@ -53,7 +53,7 @@ export const createEvent = async (req, res) => {
   const clerkUserId = getClerkUserId(req);
   const { eventName, eventTheme, location, eventDate, additionalInfo, duration } = req.body;
 
-  // ── targetAudience: array normalize + validate ───────────────────────────
+  //  targetAudience: array normalize + validate 
   const audienceArray = normalizeAudience(req.body.targetAudience);
   const audienceStr   = audienceArray.join(', ');   // DB + Calendar description-ට
 
@@ -62,22 +62,22 @@ export const createEvent = async (req, res) => {
   }
 
   try {
-    // AI-ට array pass කරනවා (buildPrompt multi-audience handle කරනවා)
+    // AI-ට array pass  (buildPrompt multi-audience handle)
     const marketingPlan = await generateMarketingPlan({
       eventName, eventTheme,
-      targetAudience: audienceArray,   // ← array
+      targetAudience: audienceArray,   
       duration, location, eventDate, additionalInfo,
     });
 
     const eventDateISO  = new Date(eventDate).toISOString();
     const eventDateOnly = eventDateISO.split('T')[0];
 
-    // DB-ට string save කරනවා
+    // DB string save 
     const { data, error } = await createEventRecord({
       clerk_user_id:   clerkUserId,
       event_name:      eventName,
       event_theme:     eventTheme,
-      target_audience: audienceStr,    // ← "Young Adults, Music Fans, General Public"
+      target_audience: audienceStr,    
       location,
       event_date:      eventDateISO,
       additional_info: additionalInfo || null,

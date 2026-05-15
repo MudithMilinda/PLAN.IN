@@ -1,5 +1,5 @@
 "use client";
-//(auth + routing)
+//auth + routing
 
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";

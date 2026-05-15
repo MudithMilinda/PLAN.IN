@@ -61,8 +61,7 @@ export function EventForm({ userId, onSuccess }: Props) {
   const [audiences, setAudiences] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-
+  //  Handlers
   // Toggle a single audience item in/out of the array
   const handleAudienceToggle = (audience: string) => {
     setFormData((prev) => {
@@ -105,7 +104,7 @@ export function EventForm({ userId, onSuccess }: Props) {
       return;
     }
 
-    // Event theme → update dynamic audience list, reset targetAudience array
+    // Event theme 
     if (name === "eventTheme") {
       setAudiences(targetAudienceMap[value] || []);
       setFormData((prev) => ({
@@ -205,7 +204,7 @@ export function EventForm({ userId, onSuccess }: Props) {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  //  Render 
   return (
     <div
       className="mt-7 min-h-screen p-4 md:p-6"

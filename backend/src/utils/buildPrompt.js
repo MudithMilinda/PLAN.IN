@@ -11,7 +11,7 @@ export function buildPrompt({ eventName, eventTheme, targetAudience, duration, l
   // ── targetAudience array → merged insights ────────────────────────────────
   const audienceArray = Array.isArray(targetAudience) ? targetAudience : [targetAudience];
 
-  // සියලුම selected audiences වල platforms, tones, bestTimes collect කරනවා
+  // selected audiences වල platforms, tones, bestTimes collect 
   const allPlatforms = new Set();
   const allTones     = new Set();
   const allBestTimes = new Set();
@@ -36,10 +36,10 @@ export function buildPrompt({ eventName, eventTheme, targetAudience, duration, l
     ? [...allBestTimes].join(' / ')
     : 'evenings and weekends';
 
-  // Prompt එකේ දාන්න audience string
+  // Prompt audience string
   const audienceStr = audienceArray.join(', ');
 
-  // ── Date calculations ─────────────────────────────────────────────────────
+  //  Date calculations 
   const eventDateObj = new Date(eventDate);
   const daysUntilEvent = Math.max(1, Math.ceil((eventDateObj - new Date()) / (1000 * 60 * 60 * 24)));
   const weeksUntilEvent = Math.ceil(daysUntilEvent / 7);

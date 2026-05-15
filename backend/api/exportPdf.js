@@ -56,7 +56,7 @@ function safeFilename(name) {
     .toLowerCase()}_marketing_plan.pdf`;
 }
 
-// ─── FIX: always set font+size on doc before calling heightOfString ───────────
+
 function textHeight(doc, text, width, fontName, fontSize) {
   doc.font(fontName).fontSize(fontSize);
   return doc.heightOfString(strip(text), { width });
@@ -81,7 +81,7 @@ function sectionHeader(doc, title, color, y, pageW, margin) {
 }
 
 function accentCard(doc, text, accentColor, bgColor, y, x, w) {
-  // FIX: set font before heightOfString so measurement is accurate
+  
   doc.font("Helvetica").fontSize(9);
   const textH = doc.heightOfString(strip(text), { width: w - 20 });
   const cardH = textH + 18;
@@ -94,7 +94,7 @@ function accentCard(doc, text, accentColor, bgColor, y, x, w) {
   return y + cardH + 6;
 }
 
-// ─── Route ────────────────────────────────────────────────────────────────────
+// Route 
 router.post("/api/export-pdf", (req, res) => {
   try {
     const clerkUserId =
@@ -131,7 +131,7 @@ router.post("/api/export-pdf", (req, res) => {
     const CW     = PW - margin * 2;
     let y        = margin;
 
-    // ── Cover ──────────────────────────────────────────────────────────────
+    //  Cover 
     doc.rect(0, 0, PW, 110).fill(hex(C.indigo));
     doc.circle(PW - 40, 20, 50).fill("#6366f1");
     doc.circle(PW - 10, 90, 30).fill("#818cf8");
@@ -164,14 +164,14 @@ router.post("/api/export-pdf", (req, res) => {
 
     y = 130;
 
-    // ── Strategy Overview ───────────────────────────────────────────────────
-    // FIX: check space for header + at least one card
+    //  Strategy Overview 
+
     y = checkPage(doc, y, 80);
     y = sectionHeader(doc, "Strategy Overview", C.indigo, y, PW, margin);
     y = accentCard(doc, plan.summary || "", C.indigo, C.indigoBg, y, margin, CW);
     y += 8;
 
-    // ── Quick Wins ──────────────────────────────────────────────────────────
+    //  Quick Wins 
     y = checkPage(doc, y, 60);
     y = sectionHeader(doc, "Quick Wins — Start Today", C.amber, y, PW, margin);
 
@@ -198,12 +198,12 @@ router.post("/api/export-pdf", (req, res) => {
     }
     y += 8;
 
-    // ── Marketing Channels ──────────────────────────────────────────────────
+    //  Marketing Channels 
     y = checkPage(doc, y, 60);
     y = sectionHeader(doc, "Marketing Channels", C.sky, y, PW, margin);
 
     for (const ch of (plan.channels || [])) {
-      // FIX: set font before heightOfString
+      
       doc.font("Helvetica").fontSize(9);
       const stratH = doc.heightOfString(strip(ch.strategy || ""), { width: CW - 20 });
       const cardH  = stratH + 36;
@@ -236,7 +236,7 @@ router.post("/api/export-pdf", (req, res) => {
     }
     y += 8;
 
-    // ── Campaign Timeline ───────────────────────────────────────────────────
+    //  Campaign Timeline 
     const timeline = plan.timeline || [];
     if (timeline.length > 0) {
       y = checkPage(doc, y, 120);
@@ -245,7 +245,7 @@ router.post("/api/export-pdf", (req, res) => {
       for (let i = 0; i < timeline.length; i++) {
       const phase = plan.timeline[i];
 
-      // FIX: set font before each heightOfString call
+      
       doc.font("Helvetica").fontSize(9);
       const focusH    = doc.heightOfString(strip(phase.focus || ""), { width: CW - 50 });
       const tasksText = (phase.tasks || []).map(t => `→  ${strip(t)}`).join("\n");
@@ -283,7 +283,7 @@ router.post("/api/export-pdf", (req, res) => {
       y += 4;
     }
 
-    // ── Budget Allocation ───────────────────────────────────────────────────
+    //  Budget Allocation 
     const budget = plan.budgetAllocation || [];
     if (budget.length > 0) {
       y = checkPage(doc, y, 140);
@@ -347,7 +347,7 @@ router.post("/api/export-pdf", (req, res) => {
 
       // Legend rows
       for (let i = 0; i < budget.length; i++) {
-      // FIX: set font before heightOfString for description
+      
       doc.font("Helvetica").fontSize(8);
       const descH = doc.heightOfString(strip(budget[i].description || ""), { width: CW - 50 });
       const rowH  = Math.max(descH + 16, 28);
@@ -371,7 +371,7 @@ router.post("/api/export-pdf", (req, res) => {
       y += 8;
     }
 
-    // ── Key Messages ────────────────────────────────────────────────────────
+    //  Key Messages
     const keyMessages = plan.keyMessages || [];
     if (keyMessages.length > 0) {
       y = checkPage(doc, y, 80);
@@ -386,7 +386,7 @@ router.post("/api/export-pdf", (req, res) => {
       y += 8;
     }
 
-    // ── Content Ideas ───────────────────────────────────────────────────────
+    //  Content Ideas 
     const ideas = plan.contentIdeas || [];
     if (ideas.length > 0) {
       y = checkPage(doc, y, 80);
@@ -396,7 +396,7 @@ router.post("/api/export-pdf", (req, res) => {
       for (let i = 0; i < ideas.length; i += 2) {
       const pair = ideas.slice(i, i + 2);
 
-      // FIX: set font before heightOfString
+      
       doc.font("Helvetica").fontSize(9);
       const heights = pair.map(idea =>
         doc.heightOfString(strip(idea.idea || ""), { width: colW - 16 }) + 36
@@ -421,7 +421,7 @@ router.post("/api/export-pdf", (req, res) => {
       y += 8;
     }
 
-    // ── Success Metrics ─────────────────────────────────────────────────────
+    //  Success Metrics
     const metrics = plan.successMetrics || [];
     if (metrics.length > 0) {
       y = checkPage(doc, y, 80);
@@ -431,7 +431,7 @@ router.post("/api/export-pdf", (req, res) => {
       for (let i = 0; i < metrics.length; i += 2) {
       const pair = metrics.slice(i, i + 2);
 
-      // FIX: set font before heightOfString
+      
       doc.font("Helvetica").fontSize(9);
       const heights = pair.map(metric =>
         doc.heightOfString(strip(metric || ""), { width: mColW - 40 }) + 20
@@ -454,7 +454,7 @@ router.post("/api/export-pdf", (req, res) => {
       y += 8;
     }
 
-    // ── Weekly Content Calendar ─────────────────────────────────────────────
+    //  Weekly Content Calendar 
     const weeks = plan.weeklyContentCalendar || [];
     if (weeks.length > 0) {
       y = checkPage(doc, y, 120);
@@ -472,7 +472,7 @@ router.post("/api/export-pdf", (req, res) => {
         y += 32;
 
         for (const post of (week.posts || [])) {
-          // FIX: set font before every heightOfString call
+     
           doc.font("Helvetica").fontSize(9);
           const descH = doc.heightOfString(strip(post.contentDescription || ""), { width: CW - 20 });
           const capH  = doc.heightOfString(strip(post.caption || ""),            { width: CW - 32 });
@@ -480,12 +480,12 @@ router.post("/api/export-pdf", (req, res) => {
           doc.font("Helvetica").fontSize(8);
           const tagsH = doc.heightOfString(strip(post.hashtags || ""),           { width: CW - 20 });
 
-          // FIX: ensure minimum cardH so content never overflows
+         
           const cardH = Math.max(descH + capH + tagsH + 70, 120);
 
           y = checkPage(doc, y, cardH + 8);
 
-          // FIX: if checkPage added new page, re-draw week header so context is clear
+          
           doc.rect(margin, y, CW, cardH).fill("#ffffff").stroke(hex(C.border)).lineWidth(0.5);
           doc.rect(margin, y, CW, 3).fill(hex(col));
 

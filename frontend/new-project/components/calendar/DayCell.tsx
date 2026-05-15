@@ -11,7 +11,6 @@ interface DayCellProps {
   dayEvents: CalendarEvent[];
   dayRef?: (el: HTMLDivElement | null) => void;
   onDateClick: (date: Date) => void;
-  // Updated: passes event + the card's bounding rect so EventPopup can position itself
   onEventClick: (event: CalendarEvent, rect: DOMRect) => void;
 }
 

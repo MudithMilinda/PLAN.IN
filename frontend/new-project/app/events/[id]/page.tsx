@@ -28,7 +28,7 @@ import {
   Image,
 } from "lucide-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//Types 
 interface WeeklyPost {
   day: string;
   type: string;
@@ -81,7 +81,7 @@ interface EventDetail {
   marketing_plan: MarketingPlan | null;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 const priorityColors: Record<string, string> = {
   High: "bg-green-500/20 text-green-400 border border-green-500/30",
   Medium: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
@@ -105,7 +105,7 @@ function formatLocation(location: string): string {
   }
 }
 
-// ─── Plan Card ────────────────────────────────────────────────────────────────
+//  Plan Card 
 function PlanCard({
   icon,
   title,
@@ -128,7 +128,7 @@ function PlanCard({
   );
 }
 
-// ─── Copy Button ──────────────────────────────────────────────────────────────
+//  Copy Button 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
@@ -156,7 +156,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── Post Type Icon ───────────────────────────────────────────────────────────
+// Post Type Icon 
 function PostTypeIcon({ type }: { type: string }) {
   const t = type.toLowerCase();
   if (t.includes("video") || t.includes("reel"))
@@ -165,7 +165,7 @@ function PostTypeIcon({ type }: { type: string }) {
   return <Image className="h-3.5 w-3.5" aria-label="Post type icon" />;
 }
 
-// ─── Weekly Content Calendar ──────────────────────────────────────────────────
+//  Weekly Content Calendar 
 function WeeklyContentCalendar({ weeks }: { weeks: WeeklyContent[] }) {
   const [openWeek, setOpenWeek] = useState<number>(0);
 
@@ -306,7 +306,7 @@ function WeeklyContentCalendar({ weeks }: { weeks: WeeklyContent[] }) {
   );
 }
 
-// ─── Main content ─────────────────────────────────────────────────────────────
+//  Main content 
 function EventDetailContent() {
   const router = useRouter();
   const params = useParams();

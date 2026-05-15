@@ -24,7 +24,7 @@ export function SidebarDemo({ children }: SidebarDemoProps) {
   const [open, setOpen] = useState(true);
   const pathname = usePathname();
 
-  // ✅ Responsive handling
+  // Responsive handling
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;

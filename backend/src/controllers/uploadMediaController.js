@@ -1,13 +1,13 @@
-// ─────────────────────────────────────────────────────────────────────────────
+
 // uploadMediaController.js
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "../config/supabase.js";
 
-// ── Multer Setup ────────────────────────────────────────────────────────────
+//  Multer Setup
 const upload = multer({
   storage: multer.memoryStorage(),
 
@@ -37,10 +37,10 @@ function extractStoragePathFromPublicUrl(url) {
   return url.substring(idx + marker.length);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Upload Controller
 // POST /api/content-posts/:id/media
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 export const uploadPostMedia = [
   upload.array("files", 10),
@@ -64,7 +64,7 @@ export const uploadPostMedia = [
       console.log("CLERK USER ID:", clerkUserId);
       console.log("BODY:", req.body);
 
-      // ── Validation ────────────────────────────────────────────────────────
+      //  Validation 
       if (!id) {
         return res.status(400).json({
           error: "Missing post ID",
@@ -77,7 +77,7 @@ export const uploadPostMedia = [
         });
       }
 
-      // ── Check Post Ownership ─────────────────────────────────────────────
+      //  Check Post Ownership 
       const { data: existingPost, error: postError } = await supabase
         .from("content_posts")
         .select("*")
@@ -95,7 +95,7 @@ export const uploadPostMedia = [
         });
       }
 
-      // ── Validate Files ───────────────────────────────────────────────────
+      //  Validate Files 
       const files = req.files;
 
       if (!files || files.length === 0) {
@@ -106,7 +106,7 @@ export const uploadPostMedia = [
 
       const uploadedUrls = [];
 
-      // ── Upload Each File ────────────────────────────────────────────────
+      //  Upload Each File 
       for (const file of files) {
         try {
           const ext = path.extname(file.originalname) || ".bin";
@@ -129,7 +129,7 @@ export const uploadPostMedia = [
             continue;
           }
 
-          // ── Get Public URL ──────────────────────────────────────────────
+          //  Get Public URL 
           const { data: publicUrlData } = supabase.storage
             .from(BUCKET)
             .getPublicUrl(storagePath);
@@ -144,21 +144,21 @@ export const uploadPostMedia = [
         }
       }
 
-      // ── Ensure Upload Success ───────────────────────────────────────────
+      //  Ensure Upload Success 
       if (uploadedUrls.length === 0) {
         return res.status(500).json({
           error: "All uploads failed",
         });
       }
 
-      // ── Merge Existing URLs ─────────────────────────────────────────────
+      //  Merge Existing URLs 
       const existingUrls = Array.isArray(existingPost.media_urls)
         ? existingPost.media_urls
         : [];
 
       const mergedUrls = [...existingUrls, ...uploadedUrls];
 
-      // ── Save URLs To DB ─────────────────────────────────────────────────
+      //  Save URLs To DB 
       const { data: updatedPost, error: updateError } = await supabase
         .from("content_posts")
         .update({
@@ -196,10 +196,10 @@ export const uploadPostMedia = [
   },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Delete Media Controller
 // DELETE /api/content-posts/:id/media
-// ─────────────────────────────────────────────────────────────────────────────
+
 export const deletePostMedia = async (req, res) => {
   try {
     let { id } = req.params;

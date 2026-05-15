@@ -6,9 +6,7 @@ import { useRouter } from "next/navigation";
 import { SidebarDemo } from "@/components/layout/Sidebar";
 import { MapPin, TrendingUp, Activity } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                               */
-/* ------------------------------------------------------------------ */
+
 interface EventItem {
   id: string;
   event_name: string;
@@ -47,14 +45,14 @@ function getVenueOnly(location: string) {
       return String((parsed as { venue?: string }).venue || "Location TBD");
     }
   } catch {
-    // Keep fallback behavior for plain-text locations.
+  
   }
   return location;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                             */
-/* ------------------------------------------------------------------ */
+
+//Helpers 
+
 
 function useClock() {
   const [now, setNow] = useState(new Date());
@@ -65,11 +63,11 @@ function useClock() {
   return now;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Sub-components                                                      */
-/* ------------------------------------------------------------------ */
 
-/** Live clock + greeting hero card */
+//Sub-components                                                 
+
+
+//Live clock + greeting hero card
 function HeroCard({ name }: { name: string }) {
   const now = useClock();
   const h = now.getHours();
@@ -326,9 +324,8 @@ function InsightsCard({ analytics }: { analytics: AnalyticsData }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
 /*  Main dashboard layout                                              */
-/* ------------------------------------------------------------------ */
+
 function DashboardContent({
   events,
   onOpenEvent,
@@ -391,9 +388,9 @@ function DashboardContent({
   );
 }
 
-/* ------------------------------------------------------------------ */
+
 /*  Page entry point                                                   */
-/* ------------------------------------------------------------------ */
+
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();

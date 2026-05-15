@@ -36,7 +36,7 @@ const BUDGET_COLORS = [
   "bg-green-500",
 ];
 
-// ── Helper: render location whether structured or legacy string ───────────────
+// Helper: render location whether structured or legacy string 
 function formatLocation(location?: LocationData | string): string {
   if (!location) return "";
   if (typeof location === "string") {
