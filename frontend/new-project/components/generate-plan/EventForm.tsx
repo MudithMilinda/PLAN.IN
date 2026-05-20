@@ -28,6 +28,9 @@ interface Props {
   onSuccess: (result: ApiResult) => void;
 }
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
+
 // ── targetAudience is now string[] ─────────────────────────────────────────
 interface FormDataMulti extends Omit<FormData, "targetAudience"> {
   targetAudience: string[];
@@ -175,7 +178,7 @@ export function EventForm({ userId, onSuccess }: Props) {
     };
 
     try {
-      const res = await fetch("https://plan-in.onrender/api/events/create", {
+      const res = await fetch(`${API_BASE}/api/events/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
