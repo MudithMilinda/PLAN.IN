@@ -95,6 +95,8 @@ const budgetColors = [
   "bg-orange-500",
   "bg-green-500",
 ];
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
 
 function formatLocation(location: string): string {
   try {
@@ -320,7 +322,7 @@ function EventDetailContent() {
       if (!user?.id || !params?.id) return;
       try {
         const response = await fetch(
-          `http://localhost:5000/api/events/${params.id}`,
+          `${API_BASE}/api/events/${params.id}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

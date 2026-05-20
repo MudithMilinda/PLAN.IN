@@ -7,7 +7,8 @@ export default function CTASection() {
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error" | "already"
   >("idle");
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_BASE =
+    process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
 
   const handleSubscribe = async () => {
     if (!email) return;

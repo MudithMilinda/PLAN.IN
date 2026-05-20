@@ -11,11 +11,17 @@ import subscribeRoutes from './src/routes/subscribeRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://planin.space';
 
 
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: [FRONTEND_URL, 'http://localhost:3000'],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Ensure req.body is always defined (DELETE requests without body, etc.)
@@ -41,5 +47,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 

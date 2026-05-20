@@ -36,6 +36,9 @@ interface AnalyticsData {
   metrics: InsightMetric[];
 }
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
+
 function getVenueOnly(location: string) {
   if (!location) return "Location TBD";
   try {
@@ -443,7 +446,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetch("http://localhost:5000/api/events", {
+    fetch(`${API_BASE}/api/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clerkUserId: user.id }),
@@ -457,7 +460,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetch("http://localhost:5000/api/profile", {
+    fetch(`${API_BASE}/api/profile`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clerkUserId: user.id }),
@@ -484,7 +487,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetch("http://localhost:5000/api/analytics", {
+    fetch(`${API_BASE}/api/analytics`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clerkUserId: user.id }),

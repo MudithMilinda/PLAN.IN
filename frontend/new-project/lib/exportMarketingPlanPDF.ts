@@ -74,12 +74,12 @@ function safeFilename(eventName?: string): string {
  * Fetches the PDF from the backend and triggers a browser download.
  *
  * @param event  - Full EventDetail object (same shape the detail page holds in state)
- * @param apiBase - Optional base URL override (defaults to http://localhost:5000)
+ * @param apiBase - Optional base URL override (defaults to NEXT_PUBLIC_API_URL or Render backend URL)
  */
 export async function exportMarketingPlanPDF(
   event: EventDetail,
   clerkUserId?: string,
-  apiBase = "http://localhost:5000",
+  apiBase = process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com",
 ): Promise<void> {
   const endpoint = `${apiBase}/api/export-pdf`;
 

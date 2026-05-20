@@ -4,7 +4,8 @@ import {
   NewEventData,
 } from "@/types/calendar";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
 
 export async function getGoogleStatus(clerkUserId: string) {
   const res = await fetch(

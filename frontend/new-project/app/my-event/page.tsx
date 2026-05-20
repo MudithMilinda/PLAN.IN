@@ -26,6 +26,9 @@ interface Event {
   marketing_plan?: object | null;
 }
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://plan-in.onrender.com";
+
 function MyEventsContent() {
   const router = useRouter();
   const { user } = useUser();
@@ -47,7 +50,7 @@ function MyEventsContent() {
         return;
       }
       try {
-        const response = await fetch("http://localhost:5000/api/events", {
+        const response = await fetch(`${API_BASE}/api/events`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clerkUserId: user.id }),
@@ -80,7 +83,7 @@ function MyEventsContent() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${deleteModal.event.id}?clerkUserId=${user.id}`,
+        `${API_BASE}/api/events/${deleteModal.event.id}?clerkUserId=${user.id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

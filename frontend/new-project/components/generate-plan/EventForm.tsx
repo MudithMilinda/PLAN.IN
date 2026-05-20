@@ -175,7 +175,7 @@ export function EventForm({ userId, onSuccess }: Props) {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/events/create", {
+      const res = await fetch("https://plan-in.onrender/api/events/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
