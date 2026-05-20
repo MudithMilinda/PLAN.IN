@@ -5,9 +5,64 @@ import { supabase } from '../config/supabase.js';
 
 const router = express.Router();
 
+function normalizeReturnTo(returnTo) {
+  if (!returnTo || typeof returnTo !== 'string') return '/calendar';
+  return returnTo.startsWith('/') ? returnTo : '/calendar';
+}
+
+function getFrontendOrigin(req) {
+  const fallback = process.env.FRONTEND_URL || 'https://planin.space';
+  const origin = req.get('origin');
+  const referer = req.get('referer');
+
+  if (origin) return origin;
+  if (referer) {
+    try {
+      return new URL(referer).origin;
+    } catch {
+      return fallback;
+    }
+  }
+
+  return fallback;
+}
+
+function buildStatePayload(clerkUserId, frontendOrigin, returnTo = '/calendar') {
+  return Buffer.from(
+    JSON.stringify({
+      clerkUserId,
+      frontendOrigin,
+      returnTo: normalizeReturnTo(returnTo),
+    })
+  ).toString('base64url');
+}
+
+function parseStatePayload(rawState) {
+  if (!rawState) return { clerkUserId: '', frontendOrigin: '', returnTo: '/calendar' };
+
+  try {
+    const parsed = JSON.parse(Buffer.from(String(rawState), 'base64url').toString('utf8'));
+    return {
+      clerkUserId: parsed?.clerkUserId || '',
+      frontendOrigin: parsed?.frontendOrigin || '',
+      returnTo: normalizeReturnTo(parsed?.returnTo),
+    };
+  } catch {
+    // Backward compatibility: old state used plain clerkUserId string.
+    return {
+      clerkUserId: String(rawState),
+      frontendOrigin: '',
+      returnTo: '/calendar',
+    };
+  }
+}
+
 router.get('/auth/google', (req, res) => {
-  const { clerkUserId } = req.query;
+  const { clerkUserId, returnTo } = req.query;
   if (!clerkUserId) return res.status(400).json({ error: 'clerkUserId required' });
+
+  const frontendOrigin = getFrontendOrigin(req);
+  const state = buildStatePayload(clerkUserId, frontendOrigin, returnTo);
 
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -15,7 +70,7 @@ router.get('/auth/google', (req, res) => {
       'https://www.googleapis.com/auth/calendar.events',
       'https://www.googleapis.com/auth/userinfo.email',
     ],
-    state: clerkUserId,
+    state,
     prompt: 'consent',
   });
 
@@ -23,16 +78,20 @@ router.get('/auth/google', (req, res) => {
 });
 
 router.get('/auth/google/callback', async (req, res) => {
-  const { code, state: clerkUserId, error } = req.query;
-  if (error) return res.redirect(`${process.env.FRONTEND_URL}/calendar?google_connected=false`);
+  const { code, state, error } = req.query;
+  const parsed = parseStatePayload(state);
+  const frontendOrigin = parsed.frontendOrigin || process.env.FRONTEND_URL || 'https://planin.space';
+  const redirectBase = `${frontendOrigin}${parsed.returnTo}`;
+
+  if (error) return res.redirect(`${redirectBase}?google_connected=false`);
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
-    await saveTokens(clerkUserId, tokens);
-    res.redirect(`${process.env.FRONTEND_URL}/calendar?google_connected=true`);
+    await saveTokens(parsed.clerkUserId, tokens);
+    res.redirect(`${redirectBase}?google_connected=true`);
   } catch (err) {
     console.error('OAuth callback error:', err);
-    res.redirect(`${process.env.FRONTEND_URL}/calendar?google_connected=false`);
+    res.redirect(`${redirectBase}?google_connected=false`);
   }
 });
 

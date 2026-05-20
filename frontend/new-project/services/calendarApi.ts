@@ -23,7 +23,7 @@ export async function disconnectGoogle(clerkUserId: string) {
 }
 
 export function getGoogleConnectUrl(clerkUserId: string) {
-  return `${API_BASE}/auth/google?clerkUserId=${clerkUserId}`;
+  return `${API_BASE}/auth/google?clerkUserId=${encodeURIComponent(clerkUserId)}&returnTo=${encodeURIComponent("/calendar")}`;
 }
 
 export async function fetchEvents(clerkUserId: string) {
