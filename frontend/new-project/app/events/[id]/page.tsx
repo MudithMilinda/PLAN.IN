@@ -321,14 +321,11 @@ function EventDetailContent() {
     const fetchEvent = async () => {
       if (!user?.id || !params?.id) return;
       try {
-        const response = await fetch(
-          `${API_BASE}/api/events/${params.id}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ clerkUserId: user.id }),
-          },
-        );
+        const response = await fetch(`${API_BASE}/api/events/${params.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clerkUserId: user.id }),
+        });
         const data = await response.json();
         if (!response.ok) {
           setError(data.error || "Failed to load event");
